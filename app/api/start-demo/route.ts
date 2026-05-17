@@ -33,6 +33,8 @@ export async function POST(req: NextRequest) {
     const name = `${firstName} ${lastName}`;
     const systemPrompt = buildSystemPrompt(scenario, name, companyName);
 
+    console.log('[start-demo] Key prefix:', process.env.ANTHROPIC_API_KEY?.slice(0, 15) ?? 'MISSING');
+
     // Call Anthropic API
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
