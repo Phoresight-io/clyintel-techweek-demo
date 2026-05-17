@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DemoSession, ConversationEntry } from "@/lib/supabase";
 
 const SCENARIO_SUFFIX: Record<number, string> = {
-  1: "The invoice is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask.",
-  2: "The invoice is 45 days past due. Tone: direct and urgent. A payment plan is available.",
-  3: "The invoice is 90 days past due. Tone: serious, final notice. Escalation to collections is the next step.",
+  1: "The invoice for their company is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask.",
+  2: "The invoice for their company is 45 days past due. Tone: direct and urgent. A payment plan is available.",
+  3: "The invoice for their company is 90 days past due. Tone: serious, final notice. Escalation to collections is the next step.",
 };
 
 function twiml(message: string): NextResponse {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       content: entry.message,
     }));
 
-    const basePrompt = `You are an AI collections agent for Clyintel. You are texting ${session.name} about an overdue invoice. Keep all replies under 160 characters. Be conversational — this is SMS. Never break character. Do not explain that you are an AI.`;
+    const basePrompt = `You are an AI collections agent for Clyintel. You are texting ${session.name} from ${session.company_name} about an overdue invoice. Keep all replies under 160 characters. Be conversational — this is SMS. Never break character. Do not explain that you are an AI.`;
     const systemPrompt = `${basePrompt} ${SCENARIO_SUFFIX[session.scenario]}`;
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {

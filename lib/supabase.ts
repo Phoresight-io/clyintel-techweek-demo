@@ -9,6 +9,7 @@ export type ConversationEntry = {
 export type DemoSession = {
   id: string;
   name: string;
+  company_name: string;
   phone: string;
   scenario: 1 | 2 | 3;
   conversation_history: ConversationEntry[];

@@ -41,6 +41,8 @@ function formatPhone(value: string): string {
 
 export default function HomePage() {
   const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [companyName, setCompanyName] = useState("Meridian Supply Co.");
   const [phone, setPhone] = useState("");
   const [selectedScenario, setSelectedScenario] = useState<1 | 2 | 3 | null>(null);
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,7 @@ export default function HomePage() {
       const res = await fetch("/api/start-demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: firstName, phone, scenario: selectedScenario }),
+        body: JSON.stringify({ firstName, lastName, companyName, phone, scenario: selectedScenario }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -107,18 +109,50 @@ export default function HomePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* First name */}
+          {/* First name + Last name */}
+          <div className="flex gap-3">
+            <div className="space-y-1 flex-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                First Name
+              </label>
+              <input
+                type="text"
+                required
+                autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Alex"
+                className="field-input"
+              />
+            </div>
+            <div className="space-y-1 flex-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Last Name
+              </label>
+              <input
+                type="text"
+                required
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Johnson"
+                className="field-input"
+              />
+            </div>
+          </div>
+
+          {/* Company name */}
           <div className="space-y-1">
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-              First Name
+              Company Name
             </label>
             <input
               type="text"
               required
-              autoComplete="given-name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder="Alex"
+              autoComplete="organization"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              placeholder="Meridian Supply Co."
               className="field-input"
             />
           </div>
