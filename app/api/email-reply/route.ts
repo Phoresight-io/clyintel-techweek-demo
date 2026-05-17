@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     if (!senderEmail || !emailText) {
       console.log("[email-reply] missing fields — senderEmail:", senderEmail, "emailText length:", emailText.length);
-      return NextResponse.json({ error: "Missing sender or body" }, { status: 400 });
+      return NextResponse.json({ ok: true }, { status: 200 });
     }
 
     // Generate reply with Anthropic
