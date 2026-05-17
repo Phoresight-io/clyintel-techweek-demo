@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 
 const SYSTEM_PROMPT = `You are a professional AI collections agent for Clyintel, recovering outstanding invoice payments on behalf of small businesses. Be firm but respectful. You may offer a discount of up to 20% as goodwill — never more. If the client requests a human or is hostile, include that someone will be in contact. Tone: 1-14 days overdue = friendly. 15-30 days = firm. 31-60 days = serious. 60+ = final notice. Respond in plain conversational text only — no JSON, no markdown.`;
 
-export async function POST(req: NextRequest) {
+async function processEmailReply(payload: unknown) {
   try {
-    const payload = await req.json();
-    console.log("[email-reply] payload:", JSON.stringify(payload).slice(0, 500));
-
-    const data = payload?.data ?? payload;
+    const data = (payload as any)?.data ?? payload;
     const senderEmail: string = data?.sender?.email ?? "";
     const senderName: string = data?.sender?.name ?? "";
     const emailText: string = data?.text ?? "";
@@ -15,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     if (!senderEmail || !emailText) {
       console.log("[email-reply] missing fields — senderEmail:", senderEmail, "emailText length:", emailText.length);
-      return NextResponse.json({ ok: true }, { status: 200 });
+      return;
     }
 
     // Generate reply with Anthropic
@@ -66,9 +64,17 @@ export async function POST(req: NextRequest) {
       throw new Error(`MailerSend error: ${mailerRes.status} — ${err}`);
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    console.log("[email-reply] reply sent to", senderEmail);
   } catch (err) {
     console.error("[email-reply] error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    return NextResponse.json({ error: "Failed to process email reply" }, { status: 500 });
   }
+}
+
+export async function POST(req: NextRequest) {
+  const payload = await req.json();
+  console.log("[email-reply] payload:", JSON.stringify(payload).slice(0, 500));
+
+  // Acknowledge immediately so MailerSend doesn't retry
+  waitUntil(processEmailReply(payload));
+  return NextResponse.json({ ok: true }, { status: 200 });
 }
