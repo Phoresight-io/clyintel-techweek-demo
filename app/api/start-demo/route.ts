@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert into Supabase
-    const { error: dbError } = await getSupabase().from("demo_sessions").insert({
+    const { error: dbError } = await (getSupabase() as any).from("demo_sessions").insert({
       name,
       phone,
       scenario,
