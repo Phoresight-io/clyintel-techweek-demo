@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
-    console.error("[start-demo]", err);
+    console.error("[start-demo] Full error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     return NextResponse.json({ error: "Failed to start demo" }, { status: 500 });
   }
 }
