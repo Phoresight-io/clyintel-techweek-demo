@@ -33,8 +33,6 @@ export async function POST(req: NextRequest) {
     const name = `${firstName} ${lastName}`;
     const systemPrompt = buildSystemPrompt(scenario, name, companyName);
 
-    console.log('[start-demo] Key prefix:', process.env.ANTHROPIC_API_KEY?.slice(0, 15) ?? 'MISSING');
-
     // Call Anthropic API
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -44,7 +42,7 @@ export async function POST(req: NextRequest) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-6",
         max_tokens: 150,
         system: systemPrompt,
         messages: [
@@ -56,13 +54,15 @@ export async function POST(req: NextRequest) {
       }),
     });
 
+    const anthropicStatus = anthropicRes.status;
+    const anthropicBody = await anthropicRes.text();
+    console.log(`[start-demo] anthropic=${anthropicStatus} key=${process.env.ANTHROPIC_API_KEY?.slice(0, 15)} body=${anthropicBody.slice(0, 200)}`);
+
     if (!anthropicRes.ok) {
-      const errBody = await anthropicRes.text();
-      throw new Error(`Anthropic error: ${anthropicRes.status} — ${errBody}`);
+      throw new Error(`Anthropic error: ${anthropicStatus} — ${anthropicBody}`);
     }
 
-    console.log('[start-demo] Anthropic OK');
-    const anthropicData = await anthropicRes.json() as {
+    const anthropicData = JSON.parse(anthropicBody) as {
       content: Array<{ type: string; text: string }>;
     };
     const aiMessage = anthropicData.content[0]?.text ?? "";
@@ -71,8 +71,6 @@ export async function POST(req: NextRequest) {
     const twilioSid = process.env.TWILIO_ACCOUNT_SID!;
     const twilioAuth = process.env.TWILIO_AUTH_TOKEN!;
     const twilioFrom = process.env.TWILIO_PHONE_NUMBER!;
-
-    console.log('[start-demo] Twilio SID prefix:', twilioSid?.slice(0, 10) ?? 'MISSING');
 
     const twilioRes = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
@@ -90,8 +88,6 @@ export async function POST(req: NextRequest) {
       const twilioErr = await twilioRes.text();
       throw new Error(`Twilio error: ${twilioRes.status} — ${twilioErr}`);
     }
-
-    console.log('[start-demo] Twilio OK');
 
     // Insert into Supabase
     const { error: dbError } = await (getSupabase() as any).from("demo_sessions").insert({
