@@ -4,7 +4,8 @@ import { useState } from "react";
 
 const SCENARIOS = [
   {
-    days: 7 as const,
+    id: 1 as const,
+    days: 7,
     label: "7 Days",
     stage: "EARLY STAGE",
     description: "First signs of distress. Catch it early.",
@@ -12,7 +13,8 @@ const SCENARIOS = [
     badge: "bg-green-500/20 text-green-400 border border-green-500/40",
   },
   {
-    days: 45 as const,
+    id: 2 as const,
+    days: 45,
     label: "45 Days",
     stage: "ESCALATING",
     description: "Situation has worsened. Time is running out.",
@@ -20,7 +22,8 @@ const SCENARIOS = [
     badge: "bg-amber-500/20 text-amber-400 border border-amber-500/40",
   },
   {
-    days: 90 as const,
+    id: 3 as const,
+    days: 90,
     label: "90 Days",
     stage: "CRITICAL",
     description: "Full-blown crisis. Every hour matters.",
@@ -39,7 +42,7 @@ function formatPhone(value: string): string {
 export default function HomePage() {
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
-  const [selectedDays, setSelectedDays] = useState<7 | 45 | 90 | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<1 | 2 | 3 | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +53,7 @@ export default function HomePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedDays) {
+    if (!selectedScenario) {
       setError("Please select a scenario.");
       return;
     }
@@ -60,7 +63,7 @@ export default function HomePage() {
       const res = await fetch("/api/start-demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, phone, scenarioDays: selectedDays }),
+        body: JSON.stringify({ name: firstName, phone, scenario: selectedScenario }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -147,9 +150,9 @@ export default function HomePage() {
                 <button
                   key={s.days}
                   type="button"
-                  onClick={() => setSelectedDays(s.days)}
+                  onClick={() => setSelectedScenario(s.id)}
                   className={`w-full text-left rounded-xl px-4 py-4 border-2 transition-all duration-150 card-bg ${
-                    selectedDays === s.days
+                    selectedScenario === s.id
                       ? `${s.activeBorder} bg-white/5`
                       : "border-transparent hover:border-white/10"
                   }`}
