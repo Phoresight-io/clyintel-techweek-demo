@@ -1,26 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0A1628;
+  --accent: #4A9EFF;
+  --card-bg: #111E35;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Prevent iOS zoom on input focus */
+input,
+select,
+textarea {
+  font-size: 16px !important;
 }
 
 @layer utilities {
+  .text-accent {
+    color: var(--accent);
+  }
+
+  .accent-badge {
+    background-color: color-mix(in srgb, var(--accent) 13%, transparent);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent);
+  }
+
+  .card-bg {
+    background-color: var(--card-bg);
+  }
+
+  .field-input {
+    @apply w-full rounded-xl px-4 py-3 text-white outline-none transition placeholder-slate-600;
+    background-color: var(--card-bg);
+    border: 1px solid #1E2E4A;
+    font-size: 16px !important;
+  }
+
+  .field-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .cta-btn {
+    background-color: var(--accent);
+    box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 27%, transparent);
+  }
+
+  .cta-btn:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--accent) 85%, white);
+  }
+
   .text-balance {
     text-wrap: balance;
   }

@@ -1,101 +1,193 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { useState } from "react";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+const SCENARIOS = [
+  {
+    days: 7 as const,
+    label: "7 Days",
+    stage: "EARLY STAGE",
+    description: "First signs of distress. Catch it early.",
+    activeBorder: "border-green-500",
+    badge: "bg-green-500/20 text-green-400 border border-green-500/40",
+  },
+  {
+    days: 45 as const,
+    label: "45 Days",
+    stage: "ESCALATING",
+    description: "Situation has worsened. Time is running out.",
+    activeBorder: "border-amber-500",
+    badge: "bg-amber-500/20 text-amber-400 border border-amber-500/40",
+  },
+  {
+    days: 90 as const,
+    label: "90 Days",
+    stage: "CRITICAL",
+    description: "Full-blown crisis. Every hour matters.",
+    activeBorder: "border-red-500",
+    badge: "bg-red-500/20 text-red-400 border border-red-500/40",
+  },
+];
+
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+export default function HomePage() {
+  const [firstName, setFirstName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [selectedDays, setSelectedDays] = useState<7 | 45 | 90 | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPhone(formatPhone(e.target.value));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedDays) {
+      setError("Please select a scenario.");
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/start-demo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, phone, scenarioDays: selectedDays }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? "Something went wrong.");
+      }
+      setSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <div className="text-5xl">📱</div>
+          <h2 className="text-2xl font-semibold text-white">Check your phone.</h2>
+          <p className="text-slate-400 text-sm">Your demo is on its way.</p>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    );
+  }
+
+  return (
+    <main className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <span className="inline-block text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-3 accent-badge">
+            Live Demo
+          </span>
+          <h1 className="text-3xl font-bold text-white leading-tight">
+            See Clyintel{" "}
+            <span className="text-accent">in action</span>
+          </h1>
+          <p className="text-slate-400 text-sm">
+            Pick a scenario and we&apos;ll walk you through a real delinquency case — delivered straight to your phone.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* First name */}
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+              First Name
+            </label>
+            <input
+              type="text"
+              required
+              autoComplete="given-name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Alex"
+              className="field-input"
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              required
+              inputMode="numeric"
+              autoComplete="tel"
+              value={phone}
+              onChange={handlePhoneChange}
+              placeholder="(555) 000-0000"
+              className="field-input"
+            />
+          </div>
+
+          {/* Scenario cards */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+              Choose a Scenario
+            </p>
+            <div className="space-y-3">
+              {SCENARIOS.map((s) => (
+                <button
+                  key={s.days}
+                  type="button"
+                  onClick={() => setSelectedDays(s.days)}
+                  className={`w-full text-left rounded-xl px-4 py-4 border-2 transition-all duration-150 card-bg ${
+                    selectedDays === s.days
+                      ? `${s.activeBorder} bg-white/5`
+                      : "border-transparent hover:border-white/10"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <div className="text-white font-semibold text-sm">
+                        {s.label} overdue
+                      </div>
+                      <div className="text-slate-400 text-xs">{s.description}</div>
+                    </div>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ${s.badge}`}>
+                      {s.stage}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <p className="text-red-400 text-sm text-center">{error}</p>
+          )}
+
+          {/* CTA */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="cta-btn w-full py-4 rounded-xl font-bold text-white text-base transition-all duration-150 active:scale-95 disabled:opacity-60"
+          >
+            {loading ? "Starting…" : "Start the Demo →"}
+          </button>
+        </form>
+
+        <p className="text-center text-xs text-slate-600">
+          No account needed. US numbers only.
+        </p>
+      </div>
+    </main>
   );
 }
