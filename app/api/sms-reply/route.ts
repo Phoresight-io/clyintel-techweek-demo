@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const body = formData.get("Body") as string;
 
     // Look up most recent session for this phone number
-    const { data: sessions, error: queryError } = await getSupabase()
+    const { data: sessions, error: queryError } = await (getSupabase() as any)
       .from("demo_sessions")
       .select("*")
       .eq("phone", from)
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     const finalHistory: ConversationEntry[] = [...updatedHistory, newAgentEntry];
 
-    const { error: updateError } = await getSupabase()
+    const { error: updateError } = await (getSupabase() as any)
       .from("demo_sessions")
       .update({
         conversation_history: finalHistory,
