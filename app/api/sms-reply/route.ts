@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DemoSession, ConversationEntry } from "@/lib/supabase";
 
 const SCENARIO_SUFFIX: Record<number, string> = {
-  1: "The invoice for their company is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask.",
-  2: "The invoice for their company is 45 days past due. Tone: direct and urgent. A payment plan is available.",
-  3: "The invoice for their company is 90 days past due. Tone: serious, final notice. Escalation to collections is the next step.",
+  1: "Invoice is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask. CRITICAL: reply MUST be 155 characters or fewer.",
+  2: "Invoice is 45 days past due. Tone: direct and urgent. Payment plan available. CRITICAL: reply MUST be 155 characters or fewer.",
+  3: "Invoice is 90 days past due. Tone: serious, final notice. Escalation to collections next. CRITICAL: reply MUST be 155 characters or fewer.",
 };
 
 function twiml(message: string): NextResponse {
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     const anthropicData = await anthropicRes.json() as {
       content: Array<{ type: string; text: string }>;
     };
-    const aiReply = anthropicData.content[0]?.text ?? "";
+    const aiReply = (anthropicData.content[0]?.text ?? "").slice(0, 155);
 
     const newAgentEntry: ConversationEntry = {
       role: "agent",

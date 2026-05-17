@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 
 function buildSystemPrompt(scenario: number, name: string, companyName: string): string {
-  const base = `You are an AI collections agent for Clyintel. You are contacting ${name} regarding an outstanding invoice for ${companyName}.`;
+  const base = `You are an AI collections agent for Clyintel. You are contacting ${name} regarding an outstanding invoice for ${companyName}. CRITICAL: Your entire reply MUST be 155 characters or fewer. Count carefully. Never exceed this limit.`;
   switch (scenario) {
     case 1:
-      return `${base} The invoice is 7 days past due. Tone: warm, professional, helpful. This is a first touch. Include a payment link placeholder [PAYMENT_LINK]. Keep it under 160 characters. Start with "Hi ${name},"`;
+      return `${base} Invoice is 7 days past due. Tone: warm, helpful. Include payment link placeholder [LINK]. Start with "Hi ${name},"`;
     case 2:
-      return `${base} The invoice is 45 days past due. Tone: direct, urgent, but not hostile. Offer a payment plan. Keep it under 160 characters. Start with "Hi ${name},"`;
+      return `${base} Invoice is 45 days past due. Tone: direct, urgent. Mention payment plan option. Start with "Hi ${name},"`;
     case 3:
-      return `${base} The invoice is 90 days past due. Tone: serious, final notice language, escalation implied. Keep it under 160 characters. Start with "Hi ${name},"`;
+      return `${base} Invoice is 90 days past due. Tone: serious, final notice. Escalation implied. Start with "Hi ${name},"`;
     default:
       return base;
   }
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     const anthropicData = JSON.parse(anthropicBody) as {
       content: Array<{ type: string; text: string }>;
     };
-    const aiMessage = anthropicData.content[0]?.text ?? "";
+    const aiMessage = (anthropicData.content[0]?.text ?? "").slice(0, 155);
 
     // Send SMS via Twilio
     const twilioSid = process.env.TWILIO_ACCOUNT_SID!;
