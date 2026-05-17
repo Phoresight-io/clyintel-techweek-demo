@@ -88,12 +88,14 @@ export async function POST(req: NextRequest) {
 
     const finalHistory: ConversationEntry[] = [...updatedHistory, newAgentEntry];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const table = getSupabase().from("demo_sessions") as any;
-    const { error: updateError } = await table.update({
-      conversation_history: finalHistory,
-      last_reply_at: new Date().toISOString(),
-    }).eq("id", session.id);
+    // @ts-ignore: supabase untyped client resolves update param as never
+    const { error: updateError } = await getSupabase()
+      .from("demo_sessions")
+      .update({
+        conversation_history: finalHistory,
+        last_reply_at: new Date().toISOString(),
+      })
+      .eq("id", session.id);
 
     if (updateError) throw updateError;
 
