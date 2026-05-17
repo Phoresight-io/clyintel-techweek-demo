@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       content: entry.message,
     }));
 
-    const basePrompt = `You are an AI collections agent for Clyintel. You are texting ${session.first_name} about an overdue invoice. Keep all replies under 160 characters. Be conversational — this is SMS. Never break character. Do not explain that you are an AI.`;
+    const basePrompt = `You are an AI collections agent for Clyintel. You are texting ${session.name} about an overdue invoice. Keep all replies under 160 characters. Be conversational — this is SMS. Never break character. Do not explain that you are an AI.`;
     const systemPrompt = `${basePrompt} ${SCENARIO_SUFFIX[session.scenario]}`;
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
