@@ -60,6 +60,10 @@ export default function HomePage() {
       setError("Please select a scenario.");
       return;
     }
+    if (!email && !phone) {
+      setError("Please enter at least an email or phone number.");
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -85,8 +89,8 @@ export default function HomePage() {
       <main className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center space-y-4">
           <div className="text-5xl">📱</div>
-          <h2 className="text-2xl font-semibold text-white">Check your phone.</h2>
-          <p className="text-slate-400 text-sm">Your demo is on its way.</p>
+          <h2 className="text-2xl font-semibold text-white">It&apos;s on its way.</h2>
+          <p className="text-slate-400 text-sm">Check your phone or inbox — your demo is live.</p>
         </div>
       </main>
     );
@@ -105,7 +109,7 @@ export default function HomePage() {
             <span className="text-accent">in action</span>
           </h1>
           <p className="text-slate-400 text-sm">
-            Pick a scenario and we&apos;ll walk you through a real delinquency case — delivered straight to your phone.
+            Pick a scenario and we&apos;ll walk you through a real delinquency case — delivered via SMS, email, or both.
           </p>
         </div>
 
@@ -158,37 +162,40 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Email */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="alex@company.com"
-              className="field-input"
-            />
-          </div>
-
-          {/* Phone */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              required
-              inputMode="numeric"
-              autoComplete="tel"
-              value={phone}
-              onChange={handlePhoneChange}
-              placeholder="(555) 000-0000"
-              className="field-input"
-            />
+          {/* Email + Phone */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+              Delivery Channel <span className="normal-case font-normal text-slate-500">(email, SMS, or both)</span>
+            </p>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="alex@company.com"
+                  className="field-input"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  placeholder="(555) 000-0000"
+                  className="field-input"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Scenario cards */}

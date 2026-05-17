@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       scenario?: number;
     };
 
-    if (!firstName || !lastName || !companyName || !email || !phone || !scenario || ![1, 2, 3].includes(scenario)) {
+    if (!firstName || !lastName || !companyName || (!email && !phone) || !scenario || ![1, 2, 3].includes(scenario)) {
       return NextResponse.json({ error: "Missing or invalid fields" }, { status: 400 });
     }
 
@@ -95,30 +95,34 @@ export async function POST(req: NextRequest) {
     };
     const aiMessage = (anthropicData.content[0]?.text ?? "").slice(0, 155);
 
-    // Send SMS via Twilio
-    const twilioSid = process.env.TWILIO_ACCOUNT_SID!;
-    const twilioAuth = process.env.TWILIO_AUTH_TOKEN!;
-    const twilioFrom = process.env.TWILIO_PHONE_NUMBER!;
+    // Send SMS via Twilio (if phone provided)
+    if (phone) {
+      const twilioSid = process.env.TWILIO_ACCOUNT_SID!;
+      const twilioAuth = process.env.TWILIO_AUTH_TOKEN!;
+      const twilioFrom = process.env.TWILIO_PHONE_NUMBER!;
 
-    const twilioRes = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${Buffer.from(`${twilioSid}:${twilioAuth}`).toString("base64")}`,
-        },
-        body: new URLSearchParams({ From: twilioFrom, To: phone, Body: aiMessage }),
+      const twilioRes = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Basic ${Buffer.from(`${twilioSid}:${twilioAuth}`).toString("base64")}`,
+          },
+          body: new URLSearchParams({ From: twilioFrom, To: phone, Body: aiMessage }),
+        }
+      );
+
+      if (!twilioRes.ok) {
+        const twilioErr = await twilioRes.text();
+        throw new Error(`Twilio error: ${twilioRes.status} — ${twilioErr}`);
       }
-    );
-
-    if (!twilioRes.ok) {
-      const twilioErr = await twilioRes.text();
-      throw new Error(`Twilio error: ${twilioRes.status} — ${twilioErr}`);
     }
 
-    // Send email via MailerSend
-    await sendEmail(email, name, SCENARIO_SUBJECTS[scenario], aiMessage);
+    // Send email via MailerSend (if email provided)
+    if (email) {
+      await sendEmail(email, name, SCENARIO_SUBJECTS[scenario], aiMessage);
+    }
 
     // Insert into Supabase
     const { error: dbError } = await (getSupabase() as any).from("demo_sessions").insert({
