@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, DemoSession } from "@/lib/supabase";
-
-type ConversationEntry = {
-  role: "agent" | "client";
-  message: string;
-  timestamp: string;
-};
+import { supabase, DemoSession, ConversationEntry } from "@/lib/supabase";
 
 const SCENARIO_SUFFIX: Record<number, string> = {
   1: "The invoice is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask.",
@@ -40,10 +34,7 @@ export async function POST(req: NextRequest) {
       return twiml("No active demo session found. Visit the demo page to start one.");
     }
 
-    const session = sessions[0] as DemoSession & {
-      scenario: number;
-      conversation_history: ConversationEntry[];
-    };
+    const session = sessions[0] as DemoSession;
 
     const newClientEntry: ConversationEntry = {
       role: "client",
