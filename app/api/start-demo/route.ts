@@ -57,9 +57,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (!anthropicRes.ok) {
-      throw new Error(`Anthropic error: ${anthropicRes.status}`);
+      const errBody = await anthropicRes.text();
+      throw new Error(`Anthropic error: ${anthropicRes.status} — ${errBody}`);
     }
 
+    console.log('[start-demo] Anthropic OK');
     const anthropicData = await anthropicRes.json() as {
       content: Array<{ type: string; text: string }>;
     };
@@ -69,6 +71,8 @@ export async function POST(req: NextRequest) {
     const twilioSid = process.env.TWILIO_ACCOUNT_SID!;
     const twilioAuth = process.env.TWILIO_AUTH_TOKEN!;
     const twilioFrom = process.env.TWILIO_PHONE_NUMBER!;
+
+    console.log('[start-demo] Twilio SID prefix:', twilioSid?.slice(0, 10) ?? 'MISSING');
 
     const twilioRes = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
@@ -83,8 +87,11 @@ export async function POST(req: NextRequest) {
     );
 
     if (!twilioRes.ok) {
-      throw new Error(`Twilio error: ${twilioRes.status}`);
+      const twilioErr = await twilioRes.text();
+      throw new Error(`Twilio error: ${twilioRes.status} — ${twilioErr}`);
     }
+
+    console.log('[start-demo] Twilio OK');
 
     // Insert into Supabase
     const { error: dbError } = await (getSupabase() as any).from("demo_sessions").insert({
