@@ -43,6 +43,7 @@ export default function HomePage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [companyName, setCompanyName] = useState("Meridian Supply Co.");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [selectedScenario, setSelectedScenario] = useState<1 | 2 | 3 | null>(null);
   const [loading, setLoading] = useState(false);
@@ -65,7 +66,7 @@ export default function HomePage() {
       const res = await fetch("/api/start-demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, companyName, phone, scenario: selectedScenario }),
+        body: JSON.stringify({ firstName, lastName, companyName, email, phone, scenario: selectedScenario }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -153,6 +154,22 @@ export default function HomePage() {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="Meridian Supply Co."
+              className="field-input"
+            />
+          </div>
+
+          {/* Email */}
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="alex@company.com"
               className="field-input"
             />
           </div>

@@ -11,6 +11,7 @@ export type DemoSession = {
   name: string;
   company_name: string;
   phone: string;
+  email: string | null;
   scenario: 1 | 2 | 3;
   conversation_history: ConversationEntry[];
   created_at: string;

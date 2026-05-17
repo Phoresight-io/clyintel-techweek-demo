@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 
+const SCENARIO_SUBJECTS: Record<number, string> = {
+  1: "A quick note about your outstanding invoice",
+  2: "Your invoice is 45 days past due — action needed",
+  3: "Final notice: your account requires immediate attention",
+};
+
 function buildSystemPrompt(scenario: number, name: string, companyName: string): string {
   const base = `You are an AI collections agent for Clyintel. You are contacting ${name} regarding an outstanding invoice for ${companyName}. CRITICAL: Your entire reply MUST be 155 characters or fewer. Count carefully. Never exceed this limit.`;
   switch (scenario) {
@@ -15,18 +21,40 @@ function buildSystemPrompt(scenario: number, name: string, companyName: string):
   }
 }
 
+async function sendEmail(to: string, name: string, subject: string, message: string) {
+  const res = await fetch("https://api.mailersend.com/v1/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.MAILERSEND_API_KEY!}`,
+    },
+    body: JSON.stringify({
+      from: { email: "team@phoresight.io", name: "Clyintel Collections" },
+      to: [{ email: to, name }],
+      subject,
+      text: message,
+      html: `<p>${message.replace(/\n/g, "<br>")}</p>`,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`MailerSend error: ${res.status} — ${err}`);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { firstName, lastName, companyName, phone, scenario } = body as {
+    const { firstName, lastName, companyName, email, phone, scenario } = body as {
       firstName?: string;
       lastName?: string;
       companyName?: string;
+      email?: string;
       phone?: string;
       scenario?: number;
     };
 
-    if (!firstName || !lastName || !companyName || !phone || !scenario || ![1, 2, 3].includes(scenario)) {
+    if (!firstName || !lastName || !companyName || !email || !phone || !scenario || ![1, 2, 3].includes(scenario)) {
       return NextResponse.json({ error: "Missing or invalid fields" }, { status: 400 });
     }
 
@@ -56,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     const anthropicStatus = anthropicRes.status;
     const anthropicBody = await anthropicRes.text();
-    console.log(`[start-demo] anthropic=${anthropicStatus} key=${process.env.ANTHROPIC_API_KEY?.slice(0, 15)} body=${anthropicBody.slice(0, 200)}`);
+    console.log(`[start-demo] anthropic=${anthropicStatus} body=${anthropicBody.slice(0, 200)}`);
 
     if (!anthropicRes.ok) {
       throw new Error(`Anthropic error: ${anthropicStatus} — ${anthropicBody}`);
@@ -89,10 +117,14 @@ export async function POST(req: NextRequest) {
       throw new Error(`Twilio error: ${twilioRes.status} — ${twilioErr}`);
     }
 
+    // Send email via MailerSend
+    await sendEmail(email, name, SCENARIO_SUBJECTS[scenario], aiMessage);
+
     // Insert into Supabase
     const { error: dbError } = await (getSupabase() as any).from("demo_sessions").insert({
       name,
       company_name: companyName,
+      email,
       phone,
       scenario,
       conversation_history: [
