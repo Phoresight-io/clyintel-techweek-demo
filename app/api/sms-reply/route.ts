@@ -88,13 +88,12 @@ export async function POST(req: NextRequest) {
 
     const finalHistory: ConversationEntry[] = [...updatedHistory, newAgentEntry];
 
-    const { error: updateError } = await getSupabase()
-      .from("demo_sessions")
-      .update({
-        conversation_history: finalHistory as unknown[],
-        last_reply_at: new Date().toISOString(),
-      } as Record<string, unknown>)
-      .eq("id", session.id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const table = getSupabase().from("demo_sessions") as any;
+    const { error: updateError } = await table.update({
+      conversation_history: finalHistory,
+      last_reply_at: new Date().toISOString(),
+    }).eq("id", session.id);
 
     if (updateError) throw updateError;
 
