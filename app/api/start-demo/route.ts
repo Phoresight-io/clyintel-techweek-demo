@@ -30,6 +30,7 @@ async function sendEmail(to: string, name: string, subject: string, message: str
     },
     body: JSON.stringify({
       from: { email: "team@phoresight.io", name: "Clyintel Collections" },
+      reply_to: { email: "ydfcveq0xfihgfgz5r4q@inbound.mailersend.net", name: "Clyintel Collections" },
       to: [{ email: to, name }],
       subject,
       text: message,
