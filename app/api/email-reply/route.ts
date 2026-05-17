@@ -5,13 +5,16 @@ const SYSTEM_PROMPT = `You are a professional AI collections agent for Clyintel,
 export async function POST(req: NextRequest) {
   try {
     const payload = await req.json();
+    console.log("[email-reply] payload:", JSON.stringify(payload).slice(0, 500));
 
-    const senderEmail: string = payload?.sender?.email ?? "";
-    const senderName: string = payload?.sender?.name ?? "";
-    const emailText: string = payload?.text ?? "";
-    const subject: string = payload?.subject ?? "";
+    const data = payload?.data ?? payload;
+    const senderEmail: string = data?.sender?.email ?? "";
+    const senderName: string = data?.sender?.name ?? "";
+    const emailText: string = data?.text ?? "";
+    const subject: string = data?.subject ?? "";
 
     if (!senderEmail || !emailText) {
+      console.log("[email-reply] missing fields — senderEmail:", senderEmail, "emailText length:", emailText.length);
       return NextResponse.json({ error: "Missing sender or body" }, { status: 400 });
     }
 
@@ -65,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
-    console.error("[email-reply]", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    console.error("[email-reply] error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     return NextResponse.json({ error: "Failed to process email reply" }, { status: 500 });
   }
 }
