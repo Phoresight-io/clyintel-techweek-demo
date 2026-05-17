@@ -91,9 +91,9 @@ export async function POST(req: NextRequest) {
     const { error: updateError } = await getSupabase()
       .from("demo_sessions")
       .update({
-        conversation_history: finalHistory,
+        conversation_history: finalHistory as unknown[],
         last_reply_at: new Date().toISOString(),
-      })
+      } as Record<string, unknown>)
       .eq("id", session.id);
 
     if (updateError) throw updateError;
