@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 const SYSTEM_PROMPTS: Record<number, string> = {
   1: "You are an AI collections agent for Clyintel. The client is 7 days past due. Tone: warm, professional, helpful. This is a first touch. Include a payment link placeholder [PAYMENT_LINK]. Keep it under 160 characters. Start with \"Hi [NAME],\"",
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert into Supabase
-    const { error: dbError } = await supabase.from("demo_sessions").insert({
+    const { error: dbError } = await getSupabase().from("demo_sessions").insert({
       name,
       phone,
       scenario,

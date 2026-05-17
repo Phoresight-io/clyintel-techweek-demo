@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, DemoSession, ConversationEntry } from "@/lib/supabase";
+import { getSupabase, DemoSession, ConversationEntry } from "@/lib/supabase";
 
 const SCENARIO_SUFFIX: Record<number, string> = {
   1: "The invoice is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask.",
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const body = formData.get("Body") as string;
 
     // Look up most recent session for this phone number
-    const { data: sessions, error: queryError } = await supabase
+    const { data: sessions, error: queryError } = await getSupabase()
       .from("demo_sessions")
       .select("*")
       .eq("phone", from)
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     const finalHistory: ConversationEntry[] = [...updatedHistory, newAgentEntry];
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabase()
       .from("demo_sessions")
       .update({
         conversation_history: finalHistory,

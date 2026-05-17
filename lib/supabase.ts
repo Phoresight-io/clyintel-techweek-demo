@@ -16,7 +16,11 @@ export type DemoSession = {
   last_reply_at: string | null;
 };
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let _client: ReturnType<typeof createClient> | null = null;
+
+export function getSupabase() {
+  return (_client ??= createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  ));
+}
