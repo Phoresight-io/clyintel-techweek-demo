@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       : scenarioNum === 2 ? 'Your invoice needs attention'
       : 'Final notice — invoice overdue 90 days'
 
-    async function sendEmail() {
+    const sendEmail = async () => {
       const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    async function sendPhoneCall() {
+    const sendPhoneCall = async () => {
       const vapiRes = await fetch('https://api.vapi.ai/call/phone', {
         method: 'POST',
         headers: {
