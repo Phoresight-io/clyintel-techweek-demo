@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
 
-const SCENARIO_MAP: Record<string, number> = { '7d': 1, '45d': 2, '90d': 3 }
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { firstName, lastName, company, email, phone, channel, scenario } = body as {
+    console.log('[start-demo] body:', JSON.stringify(body))
+    const companyName = (body as any).companyName ?? (body as any).company ?? ''
+    let scenario = (body as any).scenario
+    if (scenario === '7d') scenario = 1
+    else if (scenario === '45d') scenario = 2
+    else if (scenario === '90d') scenario = 3
+    const { firstName, lastName, email, phone, channel } = body as {
       firstName?: string
       lastName?: string
-      company?: string
       email?: string
       phone?: string
       channel?: string
-      scenario?: string
     }
 
     if (!firstName || !lastName || !phone || !channel || !scenario) {
@@ -22,13 +24,12 @@ export async function POST(req: NextRequest) {
     if ((channel === 'Email' || channel === 'Both') && !email) {
       return NextResponse.json({ error: 'Email is required for this channel' }, { status: 400 })
     }
-    const scenarioNum = SCENARIO_MAP[scenario]
+    const scenarioNum: number = typeof scenario === 'number' && [1, 2, 3].includes(scenario) ? scenario : 0
     if (!scenarioNum) {
       return NextResponse.json({ error: 'Invalid scenario' }, { status: 400 })
     }
 
     const name = `${firstName} ${lastName}`
-    const companyName = company ?? ''
 
     const { error: dbError } = await (getSupabase() as any).from('demo_sessions').insert({
       name,
