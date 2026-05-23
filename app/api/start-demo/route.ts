@@ -1,147 +1,125 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getSupabase } from "@/lib/supabase";
+import { NextRequest, NextResponse } from 'next/server'
+import { getSupabase } from '@/lib/supabase'
 
-const SCENARIO_SUBJECTS: Record<number, string> = {
-  1: "A quick note about your outstanding invoice",
-  2: "Your invoice is 45 days past due — action needed",
-  3: "Final notice: your account requires immediate attention",
-};
-
-function buildSystemPrompt(scenario: number, name: string, companyName: string): string {
-  const base = `You are an AI collections agent for Clyintel. You are contacting ${name} regarding an outstanding invoice for ${companyName}. CRITICAL: Your entire reply MUST be 155 characters or fewer. Count carefully. Never exceed this limit.`;
-  switch (scenario) {
-    case 1:
-      return `${base} Invoice is 7 days past due. Tone: warm, helpful. Include payment link placeholder [LINK]. Start with "Hi ${name},"`;
-    case 2:
-      return `${base} Invoice is 45 days past due. Tone: direct, urgent. Mention payment plan option. Start with "Hi ${name},"`;
-    case 3:
-      return `${base} Invoice is 90 days past due. Tone: serious, final notice. Escalation implied. Start with "Hi ${name},"`;
-    default:
-      return base;
-  }
-}
-
-async function sendEmail(to: string, name: string, subject: string, message: string) {
-  const res = await fetch("https://api.mailersend.com/v1/email", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.MAILERSEND_API_KEY!}`,
-    },
-    body: JSON.stringify({
-      from: { email: "team@phoresight.io", name: "Clyintel Collections" },
-      reply_to: { email: "ydfcveq0xfihgfgz5r4q@inbound.mailersend.net", name: "Clyintel Collections" },
-      to: [{ email: to, name }],
-      subject,
-      text: message,
-      html: `<p>${message.replace(/\n/g, "<br>")}</p>`,
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`MailerSend error: ${res.status} — ${err}`);
-  }
-}
+const SCENARIO_MAP: Record<string, number> = { '7d': 1, '45d': 2, '90d': 3 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { firstName, lastName, companyName, email, phone, scenario } = body as {
-      firstName?: string;
-      lastName?: string;
-      companyName?: string;
-      email?: string;
-      phone?: string;
-      scenario?: number;
-    };
-
-    if (!firstName || !lastName || !companyName || (!email && !phone) || !scenario || ![1, 2, 3].includes(scenario)) {
-      return NextResponse.json({ error: "Missing or invalid fields" }, { status: 400 });
+    const body = await req.json()
+    const { firstName, lastName, company, email, phone, channel, scenario } = body as {
+      firstName?: string
+      lastName?: string
+      company?: string
+      email?: string
+      phone?: string
+      channel?: string
+      scenario?: string
     }
 
-    const name = `${firstName} ${lastName}`;
-    const systemPrompt = buildSystemPrompt(scenario, name, companyName);
-
-    // Call Anthropic API
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY!,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 150,
-        system: systemPrompt,
-        messages: [
-          {
-            role: "user",
-            content: `Send the opening recovery message to ${name} at ${companyName}.`,
-          },
-        ],
-      }),
-    });
-
-    const anthropicStatus = anthropicRes.status;
-    const anthropicBody = await anthropicRes.text();
-    console.log(`[start-demo] anthropic=${anthropicStatus} body=${anthropicBody.slice(0, 200)}`);
-
-    if (!anthropicRes.ok) {
-      throw new Error(`Anthropic error: ${anthropicStatus} — ${anthropicBody}`);
+    if (!firstName || !lastName || !phone || !channel || !scenario) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+    if ((channel === 'Email' || channel === 'Both') && !email) {
+      return NextResponse.json({ error: 'Email is required for this channel' }, { status: 400 })
+    }
+    const scenarioNum = SCENARIO_MAP[scenario]
+    if (!scenarioNum) {
+      return NextResponse.json({ error: 'Invalid scenario' }, { status: 400 })
     }
 
-    const anthropicData = JSON.parse(anthropicBody) as {
-      content: Array<{ type: string; text: string }>;
-    };
-    const aiMessage = (anthropicData.content[0]?.text ?? "").slice(0, 155);
+    const name = `${firstName} ${lastName}`
+    const companyName = company ?? ''
 
-    // Send SMS via Twilio (if phone provided)
-    if (phone) {
-      const twilioSid = process.env.TWILIO_ACCOUNT_SID!;
-      const twilioAuth = process.env.TWILIO_AUTH_TOKEN!;
-      const twilioFrom = process.env.TWILIO_PHONE_NUMBER!;
+    const { error: dbError } = await (getSupabase() as any).from('demo_sessions').insert({
+      name,
+      company_name: companyName,
+      phone,
+      scenario: scenarioNum,
+      conversation_history: [],
+    })
+    if (dbError) throw dbError
 
-      const twilioRes = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization: `Basic ${Buffer.from(`${twilioSid}:${twilioAuth}`).toString("base64")}`,
-          },
-          body: new URLSearchParams({ From: twilioFrom, To: phone, Body: aiMessage }),
-        }
-      );
+    const daysPastDue = scenarioNum === 1 ? '7' : scenarioNum === 2 ? '45' : '90'
+    const tone = scenarioNum === 1 ? 'warm and helpful' : scenarioNum === 2 ? 'direct and urgent' : 'serious, final notice'
+    const emailSubject =
+      scenarioNum === 1 ? 'A quick note about your invoice'
+      : scenarioNum === 2 ? 'Your invoice needs attention'
+      : 'Final notice — invoice overdue 90 days'
 
-      if (!twilioRes.ok) {
-        const twilioErr = await twilioRes.text();
-        throw new Error(`Twilio error: ${twilioRes.status} — ${twilioErr}`);
+    async function sendEmail() {
+      const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY!,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          system: `You are an AI collections agent for Clyintel writing a professional recovery email to ${name} at ${companyName}. The invoice is ${daysPastDue} days past due. Tone: ${tone}. Write a concise email body only — no subject line, no greeting header, under 200 words.`,
+          messages: [{ role: 'user', content: 'Write the recovery email.' }],
+        }),
+      })
+      if (!anthropicRes.ok) {
+        const txt = await anthropicRes.text()
+        throw new Error(`Anthropic error: ${anthropicRes.status} — ${txt}`)
+      }
+      const anthropicData = await anthropicRes.json() as { content: Array<{ type: string; text: string }> }
+      const aiEmailBody = anthropicData.content[0]?.text ?? ''
+
+      const mailerRes = await fetch('https://api.mailersend.com/v1/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.MAILERSEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: { email: process.env.MAILERSEND_FROM_EMAIL, name: 'Alex from Clyintel' },
+          to: [{ email, name }],
+          subject: emailSubject,
+          text: aiEmailBody,
+        }),
+      })
+      if (!mailerRes.ok) {
+        const txt = await mailerRes.text()
+        throw new Error(`MailerSend error: ${mailerRes.status} — ${txt}`)
       }
     }
 
-    // Send email via MailerSend (if email provided)
-    if (email) {
-      await sendEmail(email, name, SCENARIO_SUBJECTS[scenario], aiMessage);
+    async function sendPhoneCall() {
+      const vapiRes = await fetch('https://api.vapi.ai/call/phone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.VAPI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          assistantId: process.env.VAPI_ASSISTANT_ID,
+          phoneNumberId: process.env.VAPI_PHONE_NUMBER_ID,
+          customer: { number: phone },
+          assistantOverrides: {
+            variableValues: { name, companyName, scenario: scenarioNum },
+          },
+        }),
+      })
+      if (!vapiRes.ok) {
+        const txt = await vapiRes.text()
+        throw new Error(`Vapi error: ${vapiRes.status} — ${txt}`)
+      }
     }
 
-    // Insert into Supabase
-    const { error: dbError } = await (getSupabase() as any).from("demo_sessions").insert({
-      name,
-      company_name: companyName,
-      email,
-      phone,
-      scenario,
-      conversation_history: [
-        { role: "agent", message: aiMessage, timestamp: new Date().toISOString() },
-      ],
-    });
+    if (channel === 'Email') {
+      await sendEmail()
+    } else if (channel === 'Phone Call') {
+      await sendPhoneCall()
+    } else if (channel === 'Both') {
+      await Promise.all([sendEmail(), sendPhoneCall()])
+    }
 
-    if (dbError) throw dbError;
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true })
   } catch (err) {
-    console.error("[start-demo] Full error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    return NextResponse.json({ error: "Failed to start demo" }, { status: 500 });
+    console.error('[start-demo] Full error:', JSON.stringify(err, Object.getOwnPropertyNames(err)))
+    return NextResponse.json({ error: 'Failed to start demo' }, { status: 500 })
   }
 }
