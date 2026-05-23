@@ -272,9 +272,9 @@ export default function HomePage() {
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 64, alignItems: 'center', flexDirection: mob ? 'column' : 'row' }}>
           {/* Left */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: C.greenDim, border: `1px solid rgba(5,150,105,0.2)`, borderRadius: 999, padding: '5px 14px', marginBottom: 28 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 999, padding: '5px 14px', marginBottom: 28 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.green, display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: C.green }}>Boston Tech Week 2026</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#2563EB' }}>Boston Tech Week 2026</span>
             </div>
             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 52 : 68, lineHeight: 1.03, color: C.text, margin: '0 0 18px', letterSpacing: '-1.5px' }}>Clyintel</h1>
             <p style={{ fontSize: mob ? 19 : 22, color: C.muted, margin: '0 0 36px', maxWidth: 520, lineHeight: 1.6 }}>
@@ -298,61 +298,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right - desktop only */}
-          {isDesktop && (
-            <div style={{ width: 260, flexShrink: 0 }}>
-              <div style={{ background: C.card, borderRadius: 20, padding: '32px 24px', boxShadow: C.shadowMd, border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                <svg width={147} height={147} viewBox="0 0 147 147" fill="none">
-                  <rect width="147" height="147" rx="8" fill="#F8FAFC"/>
-                  {/* TL finder pattern */}
-                  <rect x="10" y="10" width="45" height="45" rx="5" fill={C.text}/>
-                  <rect x="17" y="17" width="31" height="31" rx="3" fill="#F8FAFC"/>
-                  <rect x="24" y="24" width="17" height="17" rx="2" fill={C.text}/>
-                  {/* TR finder pattern */}
-                  <rect x="92" y="10" width="45" height="45" rx="5" fill={C.text}/>
-                  <rect x="99" y="17" width="31" height="31" rx="3" fill="#F8FAFC"/>
-                  <rect x="106" y="24" width="17" height="17" rx="2" fill={C.text}/>
-                  {/* BL finder pattern */}
-                  <rect x="10" y="92" width="45" height="45" rx="5" fill={C.text}/>
-                  <rect x="17" y="99" width="31" height="31" rx="3" fill="#F8FAFC"/>
-                  <rect x="24" y="106" width="17" height="17" rx="2" fill={C.text}/>
-                  {/* Data modules */}
-                  <rect x="64" y="10" width="7" height="7" fill={C.text}/>
-                  <rect x="78" y="10" width="7" height="7" fill={C.text}/>
-                  <rect x="71" y="17" width="7" height="7" fill={C.text}/>
-                  <rect x="85" y="17" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="24" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="34" width="7" height="7" fill={C.text}/>
-                  <rect x="78" y="34" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="48" width="7" height="7" fill={C.text}/>
-                  <rect x="85" y="48" width="7" height="7" fill={C.text}/>
-                  <rect x="34" y="64" width="7" height="7" fill={C.text}/>
-                  <rect x="48" y="64" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="64" width="7" height="7" fill={C.text}/>
-                  <rect x="78" y="64" width="7" height="7" fill={C.text}/>
-                  <rect x="92" y="64" width="7" height="7" fill={C.text}/>
-                  <rect x="113" y="64" width="7" height="7" fill={C.text}/>
-                  <rect x="34" y="71" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="78" width="7" height="7" fill={C.text}/>
-                  <rect x="85" y="78" width="7" height="7" fill={C.text}/>
-                  <rect x="106" y="78" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="92" width="7" height="7" fill={C.text}/>
-                  <rect x="78" y="92" width="7" height="7" fill={C.text}/>
-                  <rect x="92" y="92" width="7" height="7" fill={C.text}/>
-                  <rect x="106" y="92" width="7" height="7" fill={C.text}/>
-                  <rect x="120" y="92" width="7" height="7" fill={C.text}/>
-                  <rect x="71" y="106" width="7" height="7" fill={C.text}/>
-                  <rect x="92" y="106" width="7" height="7" fill={C.text}/>
-                  <rect x="113" y="106" width="7" height="7" fill={C.text}/>
-                  <rect x="64" y="120" width="7" height="7" fill={C.text}/>
-                  <rect x="85" y="120" width="7" height="7" fill={C.text}/>
-                  <rect x="106" y="120" width="7" height="7" fill={C.text}/>
-                  <rect x="127" y="120" width="7" height="7" fill={C.text}/>
-                </svg>
-                <p style={{ fontSize: 12, color: C.dim, textAlign: 'center', margin: 0, fontWeight: 500 }}>clyintel-techweek-demo.vercel.app</p>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
