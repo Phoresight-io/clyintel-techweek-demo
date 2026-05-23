@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
       channel?: string
     }
 
+    const normalizedPhone = phone && (phone.startsWith('+') ? phone : '+1' + phone.replace(/\D/g, ''))
+
     if (!firstName || !lastName || !phone || !channel || !scenario) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
@@ -98,7 +100,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           assistantId: process.env.VAPI_ASSISTANT_ID,
           phoneNumberId: process.env.VAPI_PHONE_NUMBER_ID,
-          customer: { number: phone },
+          customer: { number: normalizedPhone },
           assistantOverrides: {
             variableValues: { name, companyName, scenario: scenarioNum },
           },

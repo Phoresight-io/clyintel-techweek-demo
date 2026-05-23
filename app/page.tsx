@@ -186,7 +186,7 @@ export default function HomePage() {
       const res = await fetch('/api/start-demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: dFirst, lastName: dLast, company: dCompany, email: dEmail, phone: dPhone, channel: dChannel, scenario: dScenario }),
+        body: JSON.stringify({ firstName: dFirst, lastName: dLast, company: dCompany, email: dEmail, phone: '+1' + dPhone.replace(/\D/g, ''), channel: dChannel, scenario: dScenario }),
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
@@ -360,7 +360,10 @@ export default function HomePage() {
                 </div>
                 <div>
                   <label style={labelSt}>Phone</label>
-                  <input className="li" type="tel" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={inp} />
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: C.muted, pointerEvents: 'none', userSelect: 'none' }}>+1</span>
+                    <input className="li" type="tel" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={{ ...inp, paddingLeft: '44px' }} />
+                  </div>
                 </div>
               </div>
 
