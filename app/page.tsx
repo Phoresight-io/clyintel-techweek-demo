@@ -246,7 +246,7 @@ export default function HomePage() {
         height: mob ? 56 : 62, display: 'flex', alignItems: 'center', padding: '0 20px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: 1200, margin: '0 auto' }}>
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, color: C.text, flexShrink: 0 }}>Clyintel</span>
+          <img src="/phoresight-logo.jpg" alt="Phoresight" style={{ height: 40, width: 'auto', flexShrink: 0, display: 'block' }} />
           <div className="hs" style={{ display: 'flex', gap: 2, overflowX: 'auto', marginLeft: 12 }}>
             {[['Live Demo', 'demo'], ['Survey', 'survey'], ['Pricing', 'pricing'], ['Features', 'features'], ['Waitlist', 'early-access']].map(([l, h]) => (
               <button key={h} onClick={() => scrollTo(h)}
