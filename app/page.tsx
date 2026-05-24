@@ -23,9 +23,9 @@ function fmtPhone(v: string) {
 }
 
 const SCENARIOS = [
-  { id: '7d', label: '7 Days Overdue', desc: 'First signs of distress. Catch it early.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
-  { id: '45d', label: '45 Days Overdue', desc: 'Situation has worsened. Time is running out.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
-  { id: '90d', label: '90 Days Overdue', desc: 'Full-blown crisis. Every hour matters.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
+  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue — likely an oversight.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
+  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue — urgency required.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
+  { id: '90d', label: '90 Days Overdue', desc: 'Final notice. Escalation to collections is next.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
 ]
 
 const PLANS = [
@@ -382,21 +382,21 @@ export default function HomePage() {
                     const active = dScenario === s.id
                     return (
                       <button key={s.id} type="button" onClick={() => setDScenario(s.id)} style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                        minHeight: 72, padding: '14px 18px', borderRadius: 12, textAlign: 'left',
+                        display: 'block', width: '100%',
+                        padding: '14px 18px', borderRadius: 12, textAlign: 'left',
                         border: `1.5px solid ${active ? s.color : C.border}`,
                         background: active ? s.dim : C.bgAlt,
                         boxShadow: active ? `0 0 0 3px ${s.color}22` : 'none',
                         cursor: 'pointer', transition: 'all 0.15s', fontFamily: "'DM Sans', sans-serif",
                       }}>
-                        <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 4 }}>
                           <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: C.text }}>{s.label}</p>
-                          <p style={{ margin: '3px 0 0', fontSize: 13, color: C.muted }}>{s.desc}</p>
-                          <p style={{ margin: '5px 0 0', fontSize: 12, color: active ? s.color : C.dim, fontWeight: 500 }}>{s.invoice} · {s.amount}</p>
+                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 9px', borderRadius: 6, background: active ? s.color : `${s.color}18`, color: active ? '#fff' : s.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            {s.tag}
+                          </span>
                         </div>
-                        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 9px', borderRadius: 6, background: active ? s.color : `${s.color}18`, color: active ? '#fff' : s.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          {s.tag}
-                        </span>
+                        <p style={{ margin: '0 0 3px', fontSize: 14, color: C.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{s.invoice} · {s.amount}</p>
+                        <p style={{ margin: 0, fontSize: 13, color: C.muted }}>{s.desc}</p>
                       </button>
                     )
                   })}
