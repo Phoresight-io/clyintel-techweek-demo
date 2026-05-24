@@ -392,7 +392,7 @@ export default function HomePage() {
                         <div>
                           <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: C.text }}>{s.label}</p>
                           <p style={{ margin: '3px 0 0', fontSize: 13, color: C.muted }}>{s.desc}</p>
-                          <p style={{ margin: '5px 0 0', fontSize: 12, color: active ? s.color : C.dim, fontWeight: 500 }}>{s.invoice} · {s.amount}</p>
+                          <p style={{ margin: '5px 0 0', fontSize: 15, color: active ? s.color : C.text, fontWeight: 600 }}>{s.invoice} · {s.amount}</p>
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 9px', borderRadius: 6, background: active ? s.color : `${s.color}18`, color: active ? '#fff' : s.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
                           {s.tag}
