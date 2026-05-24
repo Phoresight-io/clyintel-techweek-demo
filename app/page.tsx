@@ -23,8 +23,8 @@ function fmtPhone(v: string) {
 }
 
 const SCENARIOS = [
-  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue — likely an oversight.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
-  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue — urgency required.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
+  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
+  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
   { id: '90d', label: '90 Days Overdue', desc: 'Final notice. Escalation to collections is next.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
 ]
 
