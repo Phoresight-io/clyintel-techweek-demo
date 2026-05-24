@@ -23,9 +23,9 @@ function fmtPhone(v: string) {
 }
 
 const SCENARIOS = [
-  { id: '7d', label: '7 Days Overdue', desc: 'First signs of distress. Catch it early.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim },
-  { id: '45d', label: '45 Days Overdue', desc: 'Situation has worsened. Time is running out.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim },
-  { id: '90d', label: '90 Days Overdue', desc: 'Full-blown crisis. Every hour matters.', tag: 'CRITICAL', color: C.red, dim: C.redDim },
+  { id: '7d', label: '7 Days Overdue', desc: 'First signs of distress. Catch it early.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
+  { id: '45d', label: '45 Days Overdue', desc: 'Situation has worsened. Time is running out.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
+  { id: '90d', label: '90 Days Overdue', desc: 'Full-blown crisis. Every hour matters.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
 ]
 
 const PLANS = [
@@ -113,7 +113,7 @@ export default function HomePage() {
   // Demo form
   const [dFirst, setDFirst] = useState('')
   const [dLast, setDLast] = useState('')
-  const [dCompany, setDCompany] = useState('')
+  const [dCompany] = useState('Meridian Supply Co.')
   const [dEmail, setDEmail] = useState('')
   const [dPhone, setDPhone] = useState('')
   const [dChannel, setDChannel] = useState<'Email' | 'Phone Call' | 'Both'>('Email')
@@ -202,7 +202,7 @@ export default function HomePage() {
 
   function resetDemo() {
     setDSuccess(false); setDError(null)
-    setDFirst(''); setDLast(''); setDCompany(''); setDEmail(''); setDPhone('')
+    setDFirst(''); setDLast(''); setDEmail(''); setDPhone('')
     setDChannel('Email'); setDScenario(null)
   }
 
@@ -349,7 +349,7 @@ export default function HomePage() {
               {/* Company */}
               <div>
                 <label style={labelSt}>Company Name</label>
-                <input className="li" value={dCompany} onChange={e => setDCompany(e.target.value)} placeholder="Meridian Supply Co." style={inp} />
+                <input className="li" value={dCompany} readOnly style={{ ...inp, color: C.muted, background: C.bg, cursor: 'default', userSelect: 'none' }} />
               </div>
 
               {/* Email + Phone */}
@@ -392,6 +392,7 @@ export default function HomePage() {
                         <div>
                           <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: C.text }}>{s.label}</p>
                           <p style={{ margin: '3px 0 0', fontSize: 13, color: C.muted }}>{s.desc}</p>
+                          <p style={{ margin: '5px 0 0', fontSize: 12, color: active ? s.color : C.dim, fontWeight: 500 }}>{s.invoice} · {s.amount}</p>
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 9px', borderRadius: 6, background: active ? s.color : `${s.color}18`, color: active ? '#fff' : s.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
                           {s.tag}
