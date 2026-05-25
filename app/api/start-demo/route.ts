@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
+import twilio from 'twilio'
 
 const SCENARIO_MAP: Record<string, number> = { '7d': 1, '45d': 2, '90d': 3 }
+
+const OPENING_SMS: Record<number, string> = {
+  1: "Hi {{name}}, this is Alex from Hartwell Consulting Group. A quick note — invoice INV-2024-0891 for $2,400.00 is slightly overdue. Reply to chat or visit https://pay.clyintel.com/demo to resolve. Thanks!",
+  2: "Hi {{name}}, Alex from Hartwell Consulting Group. Invoice INV-2024-0744 for $8,750.00 is 45 days past due. We need to resolve this today. Reply to discuss options.",
+  3: "Hi {{name}}, final notice from Hartwell Consulting Group. Invoice INV-2024-0612 for $15,200.00 is 90 days overdue. Reply now to avoid escalation to collections.",
+}
+
+const INVOICE_NUMBER: Record<number, string> = {
+  1: 'INV-2024-0891',
+  2: 'INV-2024-0744',
+  3: 'INV-2024-0612',
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -109,12 +122,41 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const sendSMS = async (to: string, name: string, scenarioNum: number) => {
+      const client = twilio(
+        process.env.TWILIO_ACCOUNT_SID!,
+        process.env.TWILIO_AUTH_TOKEN!
+      );
+      const body = OPENING_SMS[scenarioNum].replace('{{name}}', name.split(' ')[0]);
+      await client.messages.create({
+        body,
+        from: process.env.TWILIO_PHONE_NUMBER!,
+        to,
+      });
+    };
+
     if (channel === 'Email') {
       await sendEmail()
     } else if (channel === 'Phone Call') {
       await sendPhoneCall()
+    } else if (channel === 'SMS') {
+      await sendSMS(phone, name, scenarioNum)
+      await (getSupabase() as any).from('communications').insert({
+        channel: 'sms',
+        direction: 'outbound',
+        subject: `Opening SMS — ${INVOICE_NUMBER[scenarioNum]}`,
+        body: OPENING_SMS[scenarioNum].replace('{{name}}', name.split(' ')[0]),
+        sent_at: new Date().toISOString(),
+        status: 'sent',
+        to_address: phone,
+        from_address: process.env.TWILIO_PHONE_NUMBER!,
+        airtable_subscriber_id: 'demo',
+      })
     } else if (channel === 'Both') {
-      await Promise.all([sendEmail(), sendPhoneCall()])
+      await Promise.all([
+        sendPhoneCall(),
+        sendSMS(phone, name, scenarioNum),
+      ])
     }
 
     return NextResponse.json({ success: true })
