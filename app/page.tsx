@@ -116,7 +116,7 @@ export default function HomePage() {
   const [dCompany] = useState('MVP Supplies')
   const [dEmail, setDEmail] = useState('')
   const [dPhone, setDPhone] = useState('')
-  const [dChannel, setDChannel] = useState<'Email' | 'Phone Call' | 'SMS' | 'Both'>('Email')
+  const [dChannels, setDChannels] = useState<Set<'Email' | 'Phone Call' | 'SMS'>>(new Set())
   const [dScenario, setDScenario] = useState<string | null>(null)
   const [dLoading, setDLoading] = useState(false)
   const [dSuccess, setDSuccess] = useState(false)
@@ -173,25 +173,29 @@ export default function HomePage() {
 
   async function handleDemo(e: React.FormEvent) {
     e.preventDefault()
+    if (dChannels.size === 0) { setDError('Please select at least one channel.'); return }
     if (!dScenario) { setDError('Please select a scenario.'); return }
-    if ((dChannel === 'Email' || dChannel === 'Both') && !dEmail) {
-      setDError('Email is required for this channel.'); return
-    }
-    if ((dChannel === 'Phone Call' || dChannel === 'SMS' || dChannel === 'Both') && !dPhone) {
-      setDError('Phone is required for this channel.'); return
+    if (dChannels.has('Email') && !dEmail) { setDError('Email is required for the Email channel.'); return }
+    if ((dChannels.has('Phone Call') || dChannels.has('SMS')) && !dPhone) {
+      setDError('Phone is required for Phone Call / SMS.'); return
     }
     setDError(null)
     setDLoading(true)
     try {
-      const res = await fetch('/api/start-demo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: dFirst, lastName: dLast, company: dCompany, email: dEmail, phone: `+1${dPhone.replace(/\D/g, '')}`, channel: dChannel, scenario: dScenario }),
-      })
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}))
-        throw new Error((d as { error?: string }).error ?? 'Something went wrong.')
-      }
+      await Promise.all(
+        Array.from(dChannels).map(ch =>
+          fetch('/api/start-demo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName: dFirst, lastName: dLast, company: dCompany, email: dEmail, phone: `+1${dPhone.replace(/\D/g, '')}`, channel: ch, scenario: dScenario }),
+          }).then(async res => {
+            if (!res.ok) {
+              const d = await res.json().catch(() => ({}))
+              throw new Error((d as { error?: string }).error ?? 'Something went wrong.')
+            }
+          })
+        )
+      )
       setDSuccess(true)
     } catch (err) {
       setDError(err instanceof Error ? err.message : 'Something went wrong.')
@@ -203,8 +207,21 @@ export default function HomePage() {
   function resetDemo() {
     setDSuccess(false); setDError(null)
     setDFirst(''); setDLast(''); setDEmail(''); setDPhone('')
-    setDChannel('Email'); setDScenario(null)
+    setDChannels(new Set()); setDScenario(null)
   }
+
+  function toggleChannel(ch: 'Email' | 'Phone Call' | 'SMS') {
+    setDChannels(prev => {
+      const next = new Set(prev)
+      if (next.has(ch)) next.delete(ch)
+      else next.add(ch)
+      return next
+    })
+  }
+
+  const needsEmail = dChannels.has('Email')
+  const needsPhone = dChannels.has('Phone Call') || dChannels.has('SMS')
+  const canSubmit = dChannels.size > 0
 
   function toggleMulti(v: string) {
     setSMulti(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])
@@ -307,35 +324,36 @@ export default function HomePage() {
           <SectionTag label="LIVE DEMO" color={C.blue} />
           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>See Clyintel in action</h2>
           <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>
-            Pick a scenario and receive a real recovery sequence to your phone or inbox.
+            You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
           </p>
 
-          <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${dSuccess ? C.green : C.border}`, boxShadow: C.shadowMd, overflow: 'hidden', transition: 'border-color 0.3s' }}>
-            {/* Success banner */}
-            {dSuccess && (
-              <div style={{ background: C.greenDim, borderBottom: `1px solid rgba(5,150,105,0.2)`, padding: '16px 24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  <span style={{ color: C.green, fontSize: 18, lineHeight: 1.2, fontWeight: 700 }}>✓</span>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 700, color: C.green, fontSize: 15 }}>Demo Started</p>
-                    <p style={{ margin: '4px 0 0', fontSize: 14, color: C.muted }}>
-                      {dChannel === 'Email'
-                        ? 'Check your inbox — your recovery sequence is on its way.'
-                        : dChannel === 'Phone Call'
-                        ? 'Your phone is ringing — the AI recovery agent is calling now.'
-                        : dChannel === 'SMS'
-                        ? 'Your AI collections agent is texting you now. Reply to the message to continue the conversation.'
-                        : 'Check your phone and inbox — your recovery sequence is on its way.'}
-                    </p>
-                  </div>
-                </div>
-                <button onClick={resetDemo} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${C.green}`, background: 'transparent', color: C.green, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', flexShrink: 0 }}>
-                  Clear &amp; Reset
-                </button>
-              </div>
-            )}
+          <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`, boxShadow: C.shadowMd, overflow: 'hidden' }}>
 
             <form onSubmit={handleDemo} style={{ padding: mob ? '24px 20px' : '32px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Channel checkboxes */}
+              <div>
+                <label style={labelSt}>Delivery Channel</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {(['Email', 'Phone Call', 'SMS'] as const).map(ch => {
+                    const checked = dChannels.has(ch)
+                    return (
+                      <div key={ch} onClick={() => toggleChannel(ch)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                          border: `2px solid ${checked ? C.blue : C.border}`,
+                          background: checked ? C.blue : C.bgAlt,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'all 0.15s',
+                        }}>
+                          {checked && <span style={{ color: '#fff', fontSize: 11, fontWeight: 800, lineHeight: 1 }}>✓</span>}
+                        </div>
+                        <span style={{ fontSize: 15, color: C.text, fontWeight: 500, userSelect: 'none' }}>{ch}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
               {/* Name */}
               <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <div>
@@ -348,35 +366,30 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Company */}
-              <div>
-                <label style={labelSt}>Company Name</label>
-                <input className="li" value={dCompany} readOnly style={{ ...inp, color: C.muted, background: C.bg, cursor: 'default', userSelect: 'none' }} />
-              </div>
-
-              {/* Email + Phone */}
-              <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16 }}>
+              {/* Email — conditional */}
+              {needsEmail && (
                 <div>
                   <label style={labelSt}>Email</label>
                   <input className="li" type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="alex@company.com" style={inp} />
                 </div>
+              )}
+
+              {/* Phone — conditional */}
+              {needsPhone && (
                 <div>
                   <label style={labelSt}>Phone</label>
-                  <div style={{ display: 'flex', alignItems: 'center', borderRadius: 10, border: `1.5px solid ${C.border}`, background: C.bgAlt, overflow: 'hidden', transition: 'border-color 0.15s, box-shadow 0.15s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', borderRadius: 10, border: `1.5px solid ${C.border}`, background: '#FFFFFF', overflow: 'hidden', transition: 'border-color 0.15s, box-shadow 0.15s' }}>
                     <span style={{ padding: '10px 12px', fontSize: 16, color: C.muted, background: C.bg, borderRight: `1.5px solid ${C.border}`, flexShrink: 0, fontFamily: "'DM Sans', sans-serif", userSelect: 'none' }}>+1</span>
-                    <input className="li" type="tel" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={{ ...inp, border: 'none', borderRadius: 0, background: 'transparent', boxShadow: 'none' }} />
+                    <input className="li" type="tel" autoComplete="off" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={{ ...inp, border: 'none', borderRadius: 0, background: 'transparent', boxShadow: 'none' }} />
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Channel */}
+              {/* Company — locked */}
               <div>
-                <label style={labelSt}>Delivery Channel</label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {(['Email', 'Phone Call', 'SMS', 'Both'] as const).map(ch => (
-                    <button key={ch} type="button" onClick={() => setDChannel(ch)} style={chip(dChannel === ch, C.blue, C.blueDim)}>{ch}</button>
-                  ))}
-                </div>
+                <label style={labelSt}>Company Name</label>
+                <input className="li" value={dCompany} readOnly style={{ ...inp, color: C.muted, background: C.bg, cursor: 'default', userSelect: 'none' }} />
+                <span style={{ fontSize: 12, color: C.dim, marginTop: 4, display: 'block' }}>Demo client</span>
               </div>
 
               {/* Scenario cards */}
@@ -410,9 +423,30 @@ export default function HomePage() {
 
               {dError && <p style={{ color: C.red, fontSize: 14, margin: 0 }}>{dError}</p>}
 
-              <button type="submit" disabled={dLoading} style={{ minHeight: 54, borderRadius: 12, background: C.blue, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: dLoading ? 'not-allowed' : 'pointer', opacity: dLoading ? 0.7 : 1, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.15s' }}>
-                {dLoading ? 'Starting…' : 'Start the Demo →'}
-              </button>
+              {dSuccess ? (
+                <div style={{ background: C.greenDim, border: `1.5px solid ${C.green}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 40, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
+                  <p style={{ fontWeight: 700, fontSize: 17, color: C.green, margin: '0 0 14px' }}>Demo Started</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+                    {Array.from(dChannels).map(ch => (
+                      <p key={ch} style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.5 }}>
+                        {ch === 'Email'
+                          ? 'Expect an email from agent@phoresight.io — check your spam if you don\'t see it within a minute.'
+                          : ch === 'Phone Call'
+                          ? 'Expect a call from +1 (617) 693-4222 within the next 30 seconds.'
+                          : 'Expect a text from +1 (617) 693-4222 within the next 30 seconds.'}
+                      </p>
+                    ))}
+                  </div>
+                  <button type="button" onClick={resetDemo} style={{ padding: '8px 20px', borderRadius: 8, border: `1px solid ${C.green}`, background: 'transparent', color: C.green, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+                    Clear &amp; Reset
+                  </button>
+                </div>
+              ) : (
+                <button type="submit" disabled={dLoading || !canSubmit} style={{ minHeight: 54, borderRadius: 12, background: canSubmit ? C.blue : C.dim, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: (dLoading || !canSubmit) ? 'not-allowed' : 'pointer', opacity: dLoading ? 0.7 : 1, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.15s, background 0.15s' }}>
+                  {dLoading ? 'Starting…' : 'Start the Demo →'}
+                </button>
+              )}
 
               <p style={{ fontSize: 12, color: C.dim, textAlign: 'center', margin: 0 }}>US numbers only. No account needed.</p>
             </form>
