@@ -328,68 +328,19 @@ export default function HomePage() {
           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>See Clyintel in action</h2>
           <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`, boxShadow: C.shadowMd, overflow: 'hidden' }}>
 
-            {/* Demo example callout */}
-            <div style={{ margin: mob ? '20px 20px 0' : '28px 32px 0', padding: '14px 16px 14px 20px', background: C.blueDim, borderLeft: `4px solid ${C.blue}`, borderRadius: 10 }}>
-              <span style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.blue, marginBottom: 6 }}>Demo Example</span>
+            {/* Demo example */}
+            <div style={{ margin: mob ? '20px 20px 0' : '28px 32px 0', paddingBottom: 20, borderBottom: `1px solid ${C.border}` }}>
+              <span style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>Demo Example</span>
               <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.6 }}>
                 You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
               </p>
             </div>
 
-            {/* Step indicator */}
-            {!dSuccess && (
-              <div style={{ padding: mob ? '20px 20px 0' : '28px 32px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                  {([
-                    { n: 1, label: 'Select Method' },
-                    { n: 2, label: 'Contact Info' },
-                    { n: 3, label: 'Select Scenario' },
-                    { n: 4, label: 'Start Demo' },
-                  ] as const).map((s, i, arr) => {
-                    const completed = s.n < activeStep
-                    const active = s.n === activeStep
-                    return (
-                      <div key={s.n} style={{ display: 'flex', alignItems: 'flex-start', flex: i < arr.length - 1 ? 1 : 'none' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <div style={{
-                            width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                            border: `2px solid ${completed ? C.green : active ? C.blue : C.dim}`,
-                            background: completed ? C.green : active ? C.blue : 'transparent',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 12, fontWeight: 700,
-                            color: (completed || active) ? '#fff' : C.dim,
-                            transition: 'all 0.2s',
-                          }}>
-                            {completed ? '✓' : s.n}
-                          </div>
-                          <span style={{
-                            fontSize: 10, fontWeight: 600, marginTop: 5, textAlign: 'center',
-                            maxWidth: 60, lineHeight: 1.3, whiteSpace: 'nowrap',
-                            color: completed ? C.green : active ? C.blue : C.dim,
-                            transition: 'color 0.2s',
-                          }}>
-                            {s.label}
-                          </span>
-                        </div>
-                        {i < arr.length - 1 && (
-                          <div style={{
-                            flex: 1, height: 2, marginTop: 13, marginLeft: 4, marginRight: 4,
-                            background: completed ? C.green : C.dim,
-                            transition: 'background 0.2s',
-                          }} />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
             <form onSubmit={handleDemo} style={{ padding: mob ? '24px 20px' : '32px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-              {/* STEP 1 — Channel checkboxes (horizontal) */}
+              {/* STEP 1 — Contact Method */}
               <div>
-                <label style={labelSt}>Delivery Channel</label>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>1</span> — Contact Method</p>
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                   {(['Email', 'Phone Call', 'SMS'] as const).map(ch => {
                     const checked = dChannels.has(ch)
@@ -411,15 +362,16 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* STEP 2 — Contact Info (always visible) */}
+              {/* STEP 2 — Contact Info */}
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>2</span> — Contact Info</p>
               <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={labelSt}>First Name</label>
-                  <input className="li" required value={dFirst} onChange={e => setDFirst(e.target.value)} placeholder="Alex" style={inp} />
+                  <input className="li" required value={dFirst} onChange={e => setDFirst(e.target.value)} placeholder="Alex" style={{ ...inp, borderColor: !dFirst ? C.blue : C.border }} />
                 </div>
                 <div>
                   <label style={labelSt}>Last Name</label>
-                  <input className="li" required value={dLast} onChange={e => setDLast(e.target.value)} placeholder="Johnson" style={inp} />
+                  <input className="li" required value={dLast} onChange={e => setDLast(e.target.value)} placeholder="Johnson" style={{ ...inp, borderColor: !dLast ? C.blue : C.border }} />
                 </div>
               </div>
 
@@ -437,7 +389,8 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* STEP 3 — Scenario */}
+              {/* STEP 3 — Select Scenario */}
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>3</span> — Select Scenario</p>
               <div>
                 <label style={{ ...labelSt, marginBottom: 10 }}>Select Scenario</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -468,7 +421,8 @@ export default function HomePage() {
 
               {dError && <p style={{ color: C.red, fontSize: 14, margin: 0 }}>{dError}</p>}
 
-              {/* STEP 4 — Submit / Success */}
+              {/* STEP 4 — Start Demo */}
+              {!dSuccess && <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>4</span> — Start Demo</p>}
               {dSuccess ? (
                 <div style={{ background: C.greenDim, border: `1.5px solid ${C.green}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
                   <div style={{ fontSize: 40, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
