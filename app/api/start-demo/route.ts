@@ -69,8 +69,24 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          system: `You are an AI collections agent for Boston Tech Week writing a professional recovery email to ${name} at ${companyName} (MVP Supplies). The invoice is ${daysPastDue} days past due. Tone: ${tone}. Write a concise email body only — no subject line, no greeting header, under 200 words.`,
+          max_tokens: 200,
+          system: `You are Alex, a professional collections agent for Boston Tech Week writing a recovery email to ${name} at MVP Supplies. The invoice is ${daysPastDue} days past due. Tone: ${tone}.
+
+Write a short email body only — no subject line. Under 100 words. Plain text only — no markdown, no bullet points, no bold text.
+
+Use this exact structure with line breaks between each section:
+
+1. Greeting: Hi [first name],
+2. One sentence stating the invoice situation clearly and naturally.
+3. Payment link on its own line, preceded by a short lead-in:
+   'You can take care of it here:' or 'Please make payment here:' or 'Please remit payment immediately:' depending on urgency.
+   Then the link on the next line: https://pay.clyintel.com/demo
+4. One short sentence inviting a reply if they have questions or need to discuss options.
+5. Sign-off:
+   Alex
+   Boston Tech Week
+
+Do not invent phone numbers, addresses, or contact details. Do not threaten legal action or mention credit standing. Do not use markdown formatting of any kind.`,
           messages: [{ role: 'user', content: 'Write the recovery email.' }],
         }),
       })
@@ -88,7 +104,7 @@ export async function POST(req: NextRequest) {
           Authorization: `Bearer ${process.env.MAILERSEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: { email: process.env.MAILERSEND_FROM_EMAIL, name: 'Alex from Clyintel' },
+          from: { email: process.env.MAILERSEND_FROM_EMAIL, name: 'Alex from Boston Tech Week' },
           to: [{ email, name }],
           subject: emailSubject,
           text: aiEmailBody,
