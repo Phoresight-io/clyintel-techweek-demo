@@ -55,9 +55,9 @@ export async function POST(req: NextRequest) {
     const daysPastDue = scenarioNum === 1 ? '7' : scenarioNum === 2 ? '45' : '90'
     const tone = scenarioNum === 1 ? 'warm and helpful' : scenarioNum === 2 ? 'direct and urgent' : 'serious, final notice'
     const emailSubject =
-      scenarioNum === 1 ? 'A quick note about your invoice'
-      : scenarioNum === 2 ? 'Your invoice needs attention'
-      : 'Final notice — invoice overdue 90 days'
+      scenarioNum === 1 ? 'A quick note about your invoice from Boston Tech Week'
+      : scenarioNum === 2 ? 'Your invoice needs attention — Boston Tech Week'
+      : 'Final notice — MVP Supplies invoice 90 days overdue'
 
     const sendEmail = async () => {
       const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 300,
-          system: `You are an AI collections agent for Clyintel writing a professional recovery email to ${name} at ${companyName}. The invoice is ${daysPastDue} days past due. Tone: ${tone}. Write a concise email body only — no subject line, no greeting header, under 200 words.`,
+          system: `You are an AI collections agent for Boston Tech Week writing a professional recovery email to ${name} at ${companyName} (MVP Supplies). The invoice is ${daysPastDue} days past due. Tone: ${tone}. Write a concise email body only — no subject line, no greeting header, under 200 words.`,
           messages: [{ role: 'user', content: 'Write the recovery email.' }],
         }),
       })

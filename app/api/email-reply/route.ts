@@ -10,7 +10,6 @@ Amount: $2,400.00
 Due date: May 10, 2026
 Days past due: 7
 Client: MVP Supplies
-Contact: Charles W.
 Business collecting: Boston Tech Week
 Payment link: https://pay.clyintel.com/demo
 Discounted amount (20% off): $1,920.00`,
@@ -20,7 +19,6 @@ Amount: $8,750.00
 Due date: April 3, 2026
 Days past due: 45
 Client: MVP Supplies
-Contact: Charles W.
 Business collecting: Boston Tech Week
 Payment link: https://pay.clyintel.com/demo
 Discounted amount (20% off): $7,000.00`,
@@ -30,7 +28,6 @@ Amount: $15,200.00
 Due date: February 17, 2026
 Days past due: 90
 Client: MVP Supplies
-Contact: Charles W.
 Business collecting: Boston Tech Week
 Payment link: https://pay.clyintel.com/demo
 Discounted amount (20% off): $12,160.00`,
