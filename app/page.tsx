@@ -121,6 +121,7 @@ export default function HomePage() {
   const [dScenario, setDScenario] = useState<string | null>(null)
   const [dLoading, setDLoading] = useState(false)
   const [dSuccess, setDSuccess] = useState(false)
+  const [dModal, setDModal] = useState(false)
   const [dError, setDError] = useState<string | null>(null)
 
   // Survey
@@ -198,6 +199,7 @@ export default function HomePage() {
         )
       )
       setDSuccess(true)
+      setDModal(true)
     } catch (err) {
       setDError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
@@ -206,7 +208,7 @@ export default function HomePage() {
   }
 
   function resetDemo() {
-    setDSuccess(false); setDError(null)
+    setDSuccess(false); setDModal(false); setDError(null)
     setDFirst(''); setDLast(''); setDEmail(''); setDPhone('')
     setDChannels(new Set()); setDScenario(null)
   }
@@ -260,6 +262,48 @@ export default function HomePage() {
     <div style={{ background: C.bg, minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", color: C.text }}>
       <style>{`* { box-sizing: border-box; }`}</style>
 
+      {/* SUCCESS MODAL */}
+      {dModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 500,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '20px',
+        }}>
+          <div style={{
+            background: C.card, borderRadius: 20, padding: 32,
+            maxWidth: 420, width: '100%', boxShadow: C.shadowMd,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 56, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
+            <p style={{ fontWeight: 700, fontSize: 20, color: C.text, margin: '0 0 16px' }}>Demo Started</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28, width: '100%' }}>
+              {Array.from(dChannels).map(ch => (
+                <p key={ch} style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.6 }}>
+                  {ch === 'Email'
+                    ? "Expect an email from agent@phoresight.io — check your spam if you don't see it within a minute."
+                    : ch === 'Phone Call'
+                    ? 'Expect a call from +1 (617) 693-4222 within the next 30 seconds.'
+                    : 'Expect a text from +1 (617) 693-4222 within the next 30 seconds.'}
+                </p>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setDModal(false)}
+              style={{
+                width: '100%', minHeight: 48, borderRadius: 10,
+                background: C.blue, color: '#fff', border: 'none',
+                fontSize: 16, fontWeight: 700, cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* NAV */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
@@ -268,9 +312,9 @@ export default function HomePage() {
         height: mob ? 56 : 62, display: 'flex', alignItems: 'center', padding: '0 20px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: 1200, margin: '0 auto' }}>
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, color: C.text, flexShrink: 0 }}>Clyintel</span>
+          <img src="/brand/FullLogo_Transparent_NoBuffer.jpg" alt="Phoresight" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
           <div className="hs" style={{ display: 'flex', gap: 2, overflowX: 'auto', marginLeft: 12 }}>
-            {[['Live Demo', 'demo'], ['Survey', 'survey'], ['Pricing', 'pricing'], ['Features', 'features'], ['Waitlist', 'early-access']].map(([l, h]) => (
+            {[['Survey', 'survey'], ['Pricing', 'pricing'], ['Features', 'features'], ['Waitlist', 'early-access']].map(([l, h]) => (
               <button key={h} onClick={() => scrollTo(h)}
                 onMouseEnter={() => setNavHover(h)} onMouseLeave={() => setNavHover(null)}
                 style={{
@@ -315,7 +359,7 @@ export default function HomePage() {
                 Try the Live Demo
               </button>
               <button onClick={() => scrollTo('early-access')} style={{ padding: '13px 28px', borderRadius: 10, background: 'transparent', color: C.blue, border: `1.5px solid ${C.blue}`, fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>
-                Join the Waitlist
+                Join Waitlist
               </button>
             </div>
           </div>
@@ -344,7 +388,7 @@ export default function HomePage() {
               <div>
                 <span style={{ display: 'inline-flex', alignSelf: 'flex-start', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Contact Method</span>
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-                  {(['Email', 'Phone Call', 'SMS'] as const).map(ch => {
+                  {(['Email', 'Phone Call'] as const).map(ch => {
                     const checked = dChannels.has(ch)
                     return (
                       <div key={ch} onClick={() => toggleChannel(ch)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
@@ -361,6 +405,20 @@ export default function HomePage() {
                       </div>
                     )
                   })}
+                  {false && (
+                    <div onClick={() => toggleChannel('SMS')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <div style={{
+                        width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                        border: `2px solid ${dChannels.has('SMS') ? C.blue : C.border}`,
+                        background: dChannels.has('SMS') ? C.blue : C.bgAlt,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s',
+                      }}>
+                        {dChannels.has('SMS') && <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, lineHeight: 1 }}>✓</span>}
+                      </div>
+                      <span style={{ fontSize: 15, color: C.text, fontWeight: 500, userSelect: 'none' }}>SMS</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -425,27 +483,17 @@ export default function HomePage() {
               {/* STEP 4 — Start Demo */}
               {!dSuccess && <span style={{ display: 'inline-flex', alignSelf: 'flex-start', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 4 — Start Demo</span>}
               {dSuccess ? (
-                <div style={{ background: C.greenDim, border: `1.5px solid ${C.green}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 40, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
-                  <p style={{ fontWeight: 700, fontSize: 17, color: C.green, margin: '0 0 14px' }}>Demo Started</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-                    {Array.from(dChannels).map(ch => (
-                      <p key={ch} style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.5 }}>
-                        {ch === 'Email'
-                          ? 'Expect an email from agent@phoresight.io — check your spam if you don\'t see it within a minute.'
-                          : ch === 'Phone Call'
-                          ? 'Expect a call from +1 (617) 693-4222 within the next 30 seconds.'
-                          : 'Expect a text from +1 (617) 693-4222 within the next 30 seconds.'}
-                      </p>
-                    ))}
-                  </div>
-                  <button type="button" onClick={resetDemo} style={{ padding: '8px 20px', borderRadius: 8, border: `1px solid ${C.green}`, background: 'transparent', color: C.green, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
-                    Clear &amp; Reset
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <button type="submit" disabled={dLoading || !canSubmit} style={{ minHeight: 54, borderRadius: 12, background: canSubmit ? C.blue : C.dim, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: (dLoading || !canSubmit) ? 'not-allowed' : 'pointer', opacity: dLoading ? 0.7 : 1, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.15s, background 0.15s' }}>
+                    {dLoading ? 'Starting…' : 'Try Again'}
+                  </button>
+                  <button type="button" onClick={resetDemo} style={{ background: 'none', border: 'none', color: C.muted, fontSize: 16, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", padding: '8px 0' }}>
+                    Reset
                   </button>
                 </div>
               ) : (
                 <button type="submit" disabled={dLoading || !canSubmit} style={{ minHeight: 54, borderRadius: 12, background: canSubmit ? C.blue : C.dim, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: (dLoading || !canSubmit) ? 'not-allowed' : 'pointer', opacity: dLoading ? 0.7 : 1, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.15s, background 0.15s' }}>
-                  {dLoading ? 'Starting…' : 'Start the Demo →'}
+                  {dLoading ? 'Starting…' : 'Start Demo'}
                 </button>
               )}
 
@@ -507,7 +555,7 @@ export default function HomePage() {
 
               <div style={{ padding: '24px 28px' }}>
                 <button type="button" onClick={() => setSDone(true)} style={{ width: '100%', minHeight: 50, borderRadius: 10, background: C.blue, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
-                  Submit Survey →
+                  Submit Survey
                 </button>
               </div>
             </div>
@@ -572,8 +620,8 @@ export default function HomePage() {
       {/* EARLY ACCESS */}
       <section id="early-access" style={{ padding: mob ? '64px 20px' : '80px 24px' }}>
         <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
-          <SectionTag label="WAITLIST" color={C.gold} />
-          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Join the Waitlist</h2>
+          <SectionTag label="WAITLIST" color={C.green} />
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Join Waitlist</h2>
           <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>
             Reserve your spot on the waitlist. We'll reach out when early access opens — no payment required.
           </p>
@@ -596,8 +644,8 @@ export default function HomePage() {
                   <input className="li" type="email" value={eaEmail} onChange={e => setEaEmail(e.target.value)} placeholder="alex@company.com" style={inp} />
                 </div>
               </div>
-              <button type="button" onClick={() => setEaDone(true)} style={{ width: '100%', minHeight: 50, borderRadius: 10, background: C.gold, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
-                Join the Waitlist →
+              <button type="button" onClick={() => setEaDone(true)} style={{ width: '100%', minHeight: 50, borderRadius: 10, background: C.green, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+                Join Waitlist
               </button>
             </div>
           )}
