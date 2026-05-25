@@ -116,7 +116,7 @@ export default function HomePage() {
   const [dCompany] = useState('Meridian Supply Co.')
   const [dEmail, setDEmail] = useState('')
   const [dPhone, setDPhone] = useState('')
-  const [dChannel, setDChannel] = useState<'Email' | 'Phone Call' | 'Both'>('Email')
+  const [dChannel, setDChannel] = useState<'Email' | 'Phone Call' | 'SMS' | 'Both'>('Email')
   const [dScenario, setDScenario] = useState<string | null>(null)
   const [dLoading, setDLoading] = useState(false)
   const [dSuccess, setDSuccess] = useState(false)
@@ -177,7 +177,7 @@ export default function HomePage() {
     if ((dChannel === 'Email' || dChannel === 'Both') && !dEmail) {
       setDError('Email is required for this channel.'); return
     }
-    if ((dChannel === 'Phone Call' || dChannel === 'Both') && !dPhone) {
+    if ((dChannel === 'Phone Call' || dChannel === 'SMS' || dChannel === 'Both') && !dPhone) {
       setDError('Phone is required for this channel.'); return
     }
     setDError(null)
@@ -323,6 +323,8 @@ export default function HomePage() {
                         ? 'Check your inbox — your recovery sequence is on its way.'
                         : dChannel === 'Phone Call'
                         ? 'Your phone is ringing — the AI recovery agent is calling now.'
+                        : dChannel === 'SMS'
+                        ? 'Your AI collections agent is texting you now. Reply to the message to continue the conversation.'
                         : 'Check your phone and inbox — your recovery sequence is on its way.'}
                     </p>
                   </div>
@@ -371,7 +373,7 @@ export default function HomePage() {
               <div>
                 <label style={labelSt}>Delivery Channel</label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {(['Email', 'Phone Call', 'Both'] as const).map(ch => (
+                  {(['Email', 'Phone Call', 'SMS', 'Both'] as const).map(ch => (
                     <button key={ch} type="button" onClick={() => setDChannel(ch)} style={chip(dChannel === ch, C.blue, C.blueDim)}>{ch}</button>
                   ))}
                 </div>
