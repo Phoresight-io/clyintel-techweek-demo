@@ -221,7 +221,11 @@ export default function HomePage() {
 
   const needsEmail = dChannels.has('Email')
   const needsPhone = dChannels.has('Phone Call') || dChannels.has('SMS')
-  const canSubmit = dChannels.size > 0
+  const emailInvalid = needsEmail && (!dEmail || !dEmail.includes('@'))
+  const phoneInvalid = needsPhone && dPhone.replace(/\D/g, '').length < 10
+  const nameOk = !!dFirst && !!dLast
+  const canSubmit = dChannels.size > 0 && nameOk && !emailInvalid && !phoneInvalid && !!dScenario
+  const activeStep = dChannels.size === 0 ? 1 : !nameOk ? 2 : !canSubmit ? 3 : 4
 
   function toggleMulti(v: string) {
     setSMulti(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])
@@ -323,29 +327,75 @@ export default function HomePage() {
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
           <SectionTag label="LIVE DEMO" color={C.blue} />
           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>See Clyintel in action</h2>
-          <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>
-            You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
-          </p>
-
           <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`, boxShadow: C.shadowMd, overflow: 'hidden' }}>
 
+            {/* Step indicator */}
+            {!dSuccess && (
+              <div style={{ padding: mob ? '20px 20px 0' : '28px 32px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                  {([
+                    { n: 1, label: 'Select Method' },
+                    { n: 2, label: 'Contact Info' },
+                    { n: 3, label: 'Select Scenario' },
+                    { n: 4, label: 'Start Demo' },
+                  ] as const).map((s, i, arr) => {
+                    const completed = s.n < activeStep
+                    const active = s.n === activeStep
+                    return (
+                      <div key={s.n} style={{ display: 'flex', alignItems: 'flex-start', flex: i < arr.length - 1 ? 1 : 'none' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <div style={{
+                            width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                            border: `2px solid ${completed ? C.green : active ? C.blue : C.dim}`,
+                            background: completed ? C.green : active ? C.blue : 'transparent',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 12, fontWeight: 700,
+                            color: (completed || active) ? '#fff' : C.dim,
+                            transition: 'all 0.2s',
+                          }}>
+                            {completed ? '✓' : s.n}
+                          </div>
+                          <span style={{
+                            fontSize: 10, fontWeight: 600, marginTop: 5, textAlign: 'center',
+                            maxWidth: 60, lineHeight: 1.3, whiteSpace: 'nowrap',
+                            color: completed ? C.green : active ? C.blue : C.dim,
+                            transition: 'color 0.2s',
+                          }}>
+                            {s.label}
+                          </span>
+                        </div>
+                        {i < arr.length - 1 && (
+                          <div style={{
+                            flex: 1, height: 2, marginTop: 13, marginLeft: 4, marginRight: 4,
+                            background: completed ? C.green : C.dim,
+                            transition: 'background 0.2s',
+                          }} />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleDemo} style={{ padding: mob ? '24px 20px' : '32px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {/* Channel checkboxes */}
+
+              {/* STEP 1 — Channel checkboxes (horizontal) */}
               <div>
                 <label style={labelSt}>Delivery Channel</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                   {(['Email', 'Phone Call', 'SMS'] as const).map(ch => {
                     const checked = dChannels.has(ch)
                     return (
-                      <div key={ch} onClick={() => toggleChannel(ch)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                      <div key={ch} onClick={() => toggleChannel(ch)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                         <div style={{
-                          width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                          width: 18, height: 18, borderRadius: 4, flexShrink: 0,
                           border: `2px solid ${checked ? C.blue : C.border}`,
                           background: checked ? C.blue : C.bgAlt,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           transition: 'all 0.15s',
                         }}>
-                          {checked && <span style={{ color: '#fff', fontSize: 11, fontWeight: 800, lineHeight: 1 }}>✓</span>}
+                          {checked && <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, lineHeight: 1 }}>✓</span>}
                         </div>
                         <span style={{ fontSize: 15, color: C.text, fontWeight: 500, userSelect: 'none' }}>{ch}</span>
                       </div>
@@ -354,7 +404,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Name */}
+              {/* STEP 2 — Contact Info (always visible) */}
               <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={labelSt}>First Name</label>
@@ -366,33 +416,35 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Email — conditional */}
-              {needsEmail && (
-                <div>
-                  <label style={labelSt}>Email</label>
-                  <input className="li" type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="alex@company.com" style={inp} />
-                </div>
-              )}
+              <div>
+                <label style={labelSt}>
+                  Email{emailInvalid ? <span style={{ color: C.red, marginLeft: 2 }}>*</span> : null}
+                </label>
+                <input className="li" type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="alex@company.com"
+                  style={{ ...inp, borderColor: emailInvalid ? C.red : C.border }} />
+              </div>
 
-              {/* Phone — conditional */}
-              {needsPhone && (
-                <div>
-                  <label style={labelSt}>Phone</label>
-                  <div style={{ display: 'flex', alignItems: 'center', borderRadius: 10, border: `1.5px solid ${C.border}`, background: '#FFFFFF', overflow: 'hidden', transition: 'border-color 0.15s, box-shadow 0.15s' }}>
-                    <span style={{ padding: '10px 12px', fontSize: 16, color: C.muted, background: C.bg, borderRight: `1.5px solid ${C.border}`, flexShrink: 0, fontFamily: "'DM Sans', sans-serif", userSelect: 'none' }}>+1</span>
-                    <input className="li" type="tel" autoComplete="off" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={{ ...inp, border: 'none', borderRadius: 0, background: 'transparent', boxShadow: 'none' }} />
-                  </div>
+              <div>
+                <label style={labelSt}>
+                  Phone{phoneInvalid ? <span style={{ color: C.red, marginLeft: 2 }}>*</span> : null}
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', borderRadius: 10, border: `1.5px solid ${phoneInvalid ? C.red : C.border}`, background: '#FFFFFF', overflow: 'hidden', transition: 'border-color 0.15s' }}>
+                  <span style={{ padding: '10px 12px', fontSize: 16, color: C.muted, background: C.bg, borderRight: `1.5px solid ${C.border}`, flexShrink: 0, fontFamily: "'DM Sans', sans-serif", userSelect: 'none' }}>+1</span>
+                  <input className="li" type="tel" autoComplete="off" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={{ ...inp, border: 'none', borderRadius: 0, background: 'transparent', boxShadow: 'none' }} />
                 </div>
-              )}
+              </div>
 
-              {/* Company — locked */}
+              {/* STEP 3 — Scenario */}
+              <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.6, padding: '12px 16px', background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
+                You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
+              </p>
+
               <div>
                 <label style={labelSt}>Company Name</label>
                 <input className="li" value={dCompany} readOnly style={{ ...inp, color: C.muted, background: C.bg, cursor: 'default', userSelect: 'none' }} />
                 <span style={{ fontSize: 12, color: C.dim, marginTop: 4, display: 'block' }}>Demo client</span>
               </div>
 
-              {/* Scenario cards */}
               <div>
                 <label style={{ ...labelSt, marginBottom: 10 }}>Select Scenario</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -423,6 +475,7 @@ export default function HomePage() {
 
               {dError && <p style={{ color: C.red, fontSize: 14, margin: 0 }}>{dError}</p>}
 
+              {/* STEP 4 — Submit / Success */}
               {dSuccess ? (
                 <div style={{ background: C.greenDim, border: `1.5px solid ${C.green}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
                   <div style={{ fontSize: 40, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
