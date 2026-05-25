@@ -113,7 +113,6 @@ export default function HomePage() {
   // Demo form
   const [dFirst, setDFirst] = useState('')
   const [dLast, setDLast] = useState('')
-  const [dCompany] = useState('MVP Supplies')
   const [dEmail, setDEmail] = useState('')
   const [dPhone, setDPhone] = useState('')
   const [dChannels, setDChannels] = useState<Set<'Email' | 'Phone Call' | 'SMS'>>(new Set())
@@ -187,7 +186,7 @@ export default function HomePage() {
           fetch('/api/start-demo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName: dFirst, lastName: dLast, company: dCompany, email: dEmail, phone: `+1${dPhone.replace(/\D/g, '')}`, channel: ch, scenario: dScenario }),
+            body: JSON.stringify({ firstName: dFirst, lastName: dLast, company: 'MVP Supplies', email: dEmail, phone: `+1${dPhone.replace(/\D/g, '')}`, channel: ch, scenario: dScenario }),
           }).then(async res => {
             if (!res.ok) {
               const d = await res.json().catch(() => ({}))
@@ -329,6 +328,14 @@ export default function HomePage() {
           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>See Clyintel in action</h2>
           <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`, boxShadow: C.shadowMd, overflow: 'hidden' }}>
 
+            {/* Demo example callout */}
+            <div style={{ margin: mob ? '20px 20px 0' : '28px 32px 0', padding: '14px 16px 14px 20px', background: C.blueDim, borderLeft: `4px solid ${C.blue}`, borderRadius: 10 }}>
+              <span style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.blue, marginBottom: 6 }}>Demo Example</span>
+              <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.6 }}>
+                You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
+              </p>
+            </div>
+
             {/* Step indicator */}
             {!dSuccess && (
               <div style={{ padding: mob ? '20px 20px 0' : '28px 32px 0' }}>
@@ -417,34 +424,20 @@ export default function HomePage() {
               </div>
 
               <div>
-                <label style={labelSt}>
-                  Email{emailInvalid ? <span style={{ color: C.red, marginLeft: 2 }}>*</span> : null}
-                </label>
+                <label style={labelSt}>Email</label>
                 <input className="li" type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="alex@company.com"
-                  style={{ ...inp, borderColor: emailInvalid ? C.red : C.border }} />
+                  style={{ ...inp, borderColor: emailInvalid ? C.blue : C.border }} />
               </div>
 
               <div>
-                <label style={labelSt}>
-                  Phone{phoneInvalid ? <span style={{ color: C.red, marginLeft: 2 }}>*</span> : null}
-                </label>
-                <div style={{ display: 'flex', alignItems: 'center', borderRadius: 10, border: `1.5px solid ${phoneInvalid ? C.red : C.border}`, background: '#FFFFFF', overflow: 'hidden', transition: 'border-color 0.15s' }}>
+                <label style={labelSt}>Phone</label>
+                <div style={{ display: 'flex', alignItems: 'center', borderRadius: 10, border: `1.5px solid ${phoneInvalid ? C.blue : C.border}`, background: '#FFFFFF', overflow: 'hidden', transition: 'border-color 0.15s' }}>
                   <span style={{ padding: '10px 12px', fontSize: 16, color: C.muted, background: C.bg, borderRight: `1.5px solid ${C.border}`, flexShrink: 0, fontFamily: "'DM Sans', sans-serif", userSelect: 'none' }}>+1</span>
                   <input className="li" type="tel" autoComplete="off" value={dPhone} onChange={e => setDPhone(fmtPhone(e.target.value))} placeholder="(555) 000-0000" style={{ ...inp, border: 'none', borderRadius: 0, background: 'transparent', boxShadow: 'none' }} />
                 </div>
               </div>
 
               {/* STEP 3 — Scenario */}
-              <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.6, padding: '12px 16px', background: C.bg, borderRadius: 10, border: `1px solid ${C.border}` }}>
-                You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
-              </p>
-
-              <div>
-                <label style={labelSt}>Company Name</label>
-                <input className="li" value={dCompany} readOnly style={{ ...inp, color: C.muted, background: C.bg, cursor: 'default', userSelect: 'none' }} />
-                <span style={{ fontSize: 12, color: C.dim, marginTop: 4, display: 'block' }}>Demo client</span>
-              </div>
-
               <div>
                 <label style={{ ...labelSt, marginBottom: 10 }}>Select Scenario</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
