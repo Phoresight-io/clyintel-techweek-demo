@@ -93,7 +93,7 @@ async function processEmailReply(payload: unknown) {
 
     // Build MailerSend payload
     const mailerPayload: Record<string, unknown> = {
-      from: { email: "team@phoresight.io", name: "Clyintel Collections" },
+      from: { email: "agent@phoresight.io", name: "Clyintel Collections" },
       reply_to: { email: "ydfcveq0xfihgfgz5r4q@inbound.mailersend.net", name: "Clyintel Collections" },
       to: [{ email: senderEmail, name: senderName }],
       subject: `Re: ${subject}`,
