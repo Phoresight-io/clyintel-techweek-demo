@@ -335,9 +335,8 @@ export default function HomePage() {
         background: 'radial-gradient(ellipse at 70% -10%, rgba(37,99,235,0.08) 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, rgba(124,58,237,0.06) 0%, transparent 50%)',
         padding: mob ? '52px 20px 64px' : '88px 24px 96px',
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 64, alignItems: 'center', flexDirection: mob ? 'column' : 'row' }}>
-          {/* Left */}
-          <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+          <div style={{ width: '100%' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 999, padding: '5px 14px', marginBottom: 28 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.green, display: 'inline-block', flexShrink: 0 }} />
               <span style={{ fontSize: 13, fontWeight: 600, color: '#2563EB' }}>Boston Tech Week 2026</span>
@@ -567,7 +566,7 @@ export default function HomePage() {
       <section id="pricing" style={{ padding: mob ? '64px 0' : '80px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: mob ? '0 20px' : '0' }}>
           <SectionTag label="PRICING" color={C.blue} />
-          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Pay for results.</h2>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Pay for results</h2>
           <p style={{ fontSize: 16, color: C.muted, margin: '0 0 40px', lineHeight: 1.6 }}>Revenue share only on what we actually recover.</p>
         </div>
 
@@ -604,7 +603,7 @@ export default function HomePage() {
       <section id="features" style={{ padding: mob ? '64px 20px' : '80px 24px', background: C.bgAlt }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <SectionTag label="FEATURES" color={C.blue} />
-          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 36px', letterSpacing: '-0.5px' }}>Everything you need to get paid.</h2>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 36px', letterSpacing: '-0.5px' }}>Everything you need to get paid</h2>
           <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 20 }}>
             {FEATURES.map(f => (
               <div key={f.title} style={{ background: C.card, borderRadius: 16, padding: '24px', border: `1px solid ${C.border}`, boxShadow: C.shadow }}>
