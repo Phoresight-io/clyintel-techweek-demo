@@ -5,9 +5,9 @@ import twilio from 'twilio'
 const SCENARIO_MAP: Record<string, number> = { '7d': 1, '45d': 2, '90d': 3 }
 
 const OPENING_SMS: Record<number, string> = {
-  1: "Hi {{name}}, this is Alex from Hartwell Consulting Group. A quick note — invoice INV-2024-0891 for $2,400.00 is slightly overdue. Reply to chat or visit https://pay.clyintel.com/demo to resolve. Thanks!",
-  2: "Hi {{name}}, Alex from Hartwell Consulting Group. Invoice INV-2024-0744 for $8,750.00 is 45 days past due. We need to resolve this today. Reply to discuss options.",
-  3: "Hi {{name}}, final notice from Hartwell Consulting Group. Invoice INV-2024-0612 for $15,200.00 is 90 days overdue. Reply now to avoid escalation to collections.",
+  1: "Hi {{firstName}}, MVP Supplies has invoice INV-2024-0891 past due. Pay here: https://pay.clyintel.com/demo — we're here to help.",
+  2: "Hi {{firstName}}, MVP Supplies has invoice INV-2024-0744 45 days past due. Pay now: https://pay.clyintel.com/demo — reply and we'll work it out.",
+  3: "Hi {{firstName}}, final notice — MVP Supplies has invoice INV-2024-0612 90 days past due. Remit immediately: https://pay.clyintel.com/demo — reply before this escalates.",
 }
 
 const INVOICE_NUMBER: Record<number, string> = {
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
         process.env.TWILIO_ACCOUNT_SID!,
         process.env.TWILIO_AUTH_TOKEN!
       );
-      const body = OPENING_SMS[scenarioNum].replace('{{name}}', name.split(' ')[0]);
+      const body = OPENING_SMS[scenarioNum].replace('{{firstName}}', name.split(' ')[0]);
       await client.messages.create({
         body,
         from: process.env.TWILIO_PHONE_NUMBER!,
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
         channel: 'sms',
         direction: 'outbound',
         subject: `Opening SMS — ${INVOICE_NUMBER[scenarioNum]}`,
-        body: OPENING_SMS[scenarioNum].replace('{{name}}', name.split(' ')[0]),
+        body: OPENING_SMS[scenarioNum].replace('{{firstName}}', name.split(' ')[0]),
         sent_at: new Date().toISOString(),
         status: 'sent',
         to_address: phone,
