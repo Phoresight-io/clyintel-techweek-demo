@@ -23,7 +23,7 @@ function fmtPhone(v: string) {
 }
 
 const SCENARIOS = [
-  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue — likely an oversight.', tag: 'EARLY STAGE', color: C.blue, dim: C.blueDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
+  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue — likely an oversight.', tag: 'LATE REMINDER', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
   { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue — urgency required.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
   { id: '90d', label: '90 Days Overdue', desc: 'Final notice. Escalation to collections is next.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
 ]
@@ -325,7 +325,7 @@ export default function HomePage() {
       <section id="demo" style={{ padding: mob ? '64px 20px' : '80px 24px' }}>
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
           <SectionTag label="LIVE DEMO" color={C.blue} />
-          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>See Clyintel in action</h2>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Clyintel in Action</h2>
           <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`, boxShadow: C.shadowMd, overflow: 'hidden' }}>
 
             {/* Demo example */}
@@ -340,7 +340,7 @@ export default function HomePage() {
 
               {/* STEP 1 — Contact Method */}
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>1</span> — Contact Method</p>
+                <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Contact Method</span>
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                   {(['Email', 'Phone Call', 'SMS'] as const).map(ch => {
                     const checked = dChannels.has(ch)
@@ -363,11 +363,11 @@ export default function HomePage() {
               </div>
 
               {/* STEP 2 — Contact Info */}
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>2</span> — Contact Info</p>
+              <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 2 — Contact Info</span>
               <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={labelSt}>First Name</label>
-                  <input className="li" required value={dFirst} onChange={e => setDFirst(e.target.value)} placeholder="Alex" style={{ ...inp, borderColor: !dFirst ? C.blue : C.border }} />
+                  <input className="li" required value={dFirst} onChange={e => setDFirst(e.target.value)} placeholder="John" style={{ ...inp, borderColor: !dFirst ? C.blue : C.border }} />
                 </div>
                 <div>
                   <label style={labelSt}>Last Name</label>
@@ -390,9 +390,8 @@ export default function HomePage() {
               </div>
 
               {/* STEP 3 — Select Scenario */}
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>3</span> — Select Scenario</p>
               <div>
-                <label style={{ ...labelSt, marginBottom: 10 }}>Select Scenario</label>
+                <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 3 — Select Scenario</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {SCENARIOS.map(s => {
                     const active = dScenario === s.id
@@ -422,7 +421,7 @@ export default function HomePage() {
               {dError && <p style={{ color: C.red, fontSize: 14, margin: 0 }}>{dError}</p>}
 
               {/* STEP 4 — Start Demo */}
-              {!dSuccess && <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, margin: '0 0 10px' }}>Step <span style={{ color: C.blue }}>4</span> — Start Demo</p>}
+              {!dSuccess && <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 4 — Start Demo</span>}
               {dSuccess ? (
                 <div style={{ background: C.greenDim, border: `1.5px solid ${C.green}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
                   <div style={{ fontSize: 40, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
