@@ -24,15 +24,28 @@ function fmtPhone(v: string) {
 }
 
 const SCENARIOS = [
-  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue — likely an oversight.', tag: 'LATE REMINDER', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
-  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue — urgency required.', tag: 'ESCALATING', color: C.orange, dim: C.orangeDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
+  { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue.', tag: 'LATE REMINDER', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
+  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue.', tag: 'ESCALATING', color: C.orange, dim: C.orangeDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
   { id: '90d', label: '90 Days Overdue', desc: 'Final notice. Escalation to collections is next.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
 ]
 
 const PLANS = [
-  { name: 'Free', price: 0, color: C.green, bullets: ['Up to 5 clients', 'Email outreach only', 'Basic payment risk scoring', '22% revenue share on recoveries'] },
-  { name: 'Starter', price: 29, color: C.blue, bullets: ['Up to 20 clients/month', 'Email + SMS outreach', 'Payment risk scoring', '18% revenue share on recoveries'] },
-  { name: 'Standard', price: 79, color: C.purple, bullets: ['Up to 50 clients/month', 'Email + SMS + Voice outreach', 'Predictive payment insights', '12% revenue share on recoveries'] },
+  {
+    name: 'Free', price: 0, color: C.blue, dim: 'rgba(37,99,235,0.08)',
+    bullets: ['Up to 1 client score/month', 'Email outreach only', 'AR dashboard', '22% revenue share on recoveries', 'Community support'],
+  },
+  {
+    name: 'Starter', price: 29, color: '#1D4ED8', dim: 'rgba(29,78,216,0.08)',
+    bullets: ['Up to 20 client scores/month', 'Email outreach — basic workflows', 'Risk flags', '18% revenue share on recoveries', 'Email + Chat support'],
+  },
+  {
+    name: 'Plus', price: 79, color: '#1E3A8A', dim: 'rgba(30,58,138,0.08)',
+    bullets: ['Unlimited client scores', 'Advanced multi-step workflows', 'Predictive delinquency insights', 'Payment plan creation', '12% revenue share on recoveries', 'Webhook support'],
+  },
+  {
+    name: 'Pro', price: 199, color: '#172554', dim: 'rgba(23,37,84,0.08)',
+    bullets: ['Unlimited recoveries', 'Multi-channel: email + SMS + voice', 'Advanced negotiation', 'Custom dashboards', '5% revenue share on recoveries', 'Quarterly business reviews'],
+  },
 ]
 
 const FEATURES = [
@@ -56,6 +69,9 @@ const BG_MAP: Record<string, string> = {
   [C.gold]: C.goldDim,
   [C.orange]: C.orangeDim,
   [C.green]: C.greenDim,
+  '#1D4ED8': 'rgba(29,78,216,0.08)',
+  '#1E3A8A': 'rgba(30,58,138,0.08)',
+  '#172554': 'rgba(23,37,84,0.08)',
 }
 
 function SectionTag({ label, color }: { label: string; color: string }) {
@@ -75,7 +91,7 @@ function PlanCard({ plan, onCta }: { plan: typeof PLANS[0]; onCta: () => void })
       border: `1.5px solid ${C.border}`, boxShadow: C.shadow,
       display: 'flex', flexDirection: 'column', height: '100%',
     }}>
-      <div style={{ width: 40, height: 40, borderRadius: 12, background: BG_MAP[plan.color] ?? C.blueDim, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+      <div style={{ width: 40, height: 40, borderRadius: 12, background: plan.dim, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
         <div style={{ width: 16, height: 16, borderRadius: 4, background: plan.color }} />
       </div>
       <p style={{ fontWeight: 700, fontSize: 18, color: C.text, margin: '0 0 4px' }}>{plan.name}</p>
@@ -566,7 +582,7 @@ export default function HomePage() {
       <section id="pricing" style={{ padding: mob ? '64px 0' : '80px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: mob ? '0 20px' : '0' }}>
           <SectionTag label="PRICING" color={C.blue} />
-          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Pay for results</h2>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Simple, transparent pricing</h2>
           <p style={{ fontSize: 16, color: C.muted, margin: '0 0 40px', lineHeight: 1.6 }}>Revenue share only on what we actually recover.</p>
         </div>
 
