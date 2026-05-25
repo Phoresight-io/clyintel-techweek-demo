@@ -10,6 +10,7 @@ const C = {
   blue: '#2563EB', blueDim: 'rgba(37,99,235,0.08)',
   purple: '#7C3AED', purpleDim: 'rgba(124,58,237,0.07)',
   gold: '#D97706', goldDim: 'rgba(217,119,6,0.08)',
+  orange: '#EA580C', orangeDim: 'rgba(234,88,12,0.08)',
   red: '#DC2626', redDim: 'rgba(220,38,38,0.08)',
   green: '#059669', greenDim: 'rgba(5,150,105,0.08)',
   text: '#0F172A', muted: '#475569', dim: '#94A3B8',
@@ -24,7 +25,7 @@ function fmtPhone(v: string) {
 
 const SCENARIOS = [
   { id: '7d', label: '7 Days Overdue', desc: 'Friendly reminder. Payment slightly overdue — likely an oversight.', tag: 'LATE REMINDER', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0891', amount: '$2,400.00' },
-  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue — urgency required.', tag: 'ESCALATING', color: C.gold, dim: C.goldDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
+  { id: '45d', label: '45 Days Overdue', desc: 'Firm follow-up. Payment seriously overdue — urgency required.', tag: 'ESCALATING', color: C.orange, dim: C.orangeDim, invoice: 'INV-2024-0744', amount: '$8,750.00' },
   { id: '90d', label: '90 Days Overdue', desc: 'Final notice. Escalation to collections is next.', tag: 'CRITICAL', color: C.red, dim: C.redDim, invoice: 'INV-2024-0612', amount: '$15,200.00' },
 ]
 
@@ -53,6 +54,7 @@ const SURVEY_SINGLES = [
 const BG_MAP: Record<string, string> = {
   [C.blue]: C.blueDim,
   [C.gold]: C.goldDim,
+  [C.orange]: C.orangeDim,
   [C.green]: C.greenDim,
 }
 
@@ -329,7 +331,7 @@ export default function HomePage() {
           <div style={{ background: C.card, borderRadius: 20, border: `1.5px solid ${C.border}`, boxShadow: C.shadowMd, overflow: 'hidden' }}>
 
             {/* Demo example */}
-            <div style={{ margin: mob ? '20px 20px 0' : '28px 32px 0', paddingBottom: 20, borderBottom: `1px solid ${C.border}` }}>
+            <div style={{ background: C.blueDim, padding: '20px 32px', borderBottom: `1px solid ${C.border}` }}>
               <span style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>Demo Example</span>
               <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.6 }}>
                 You are MVP Supplies — a client with an overdue invoice. Select a scenario and experience how Boston Tech Week uses Clyintel to recover payments.
@@ -340,7 +342,7 @@ export default function HomePage() {
 
               {/* STEP 1 — Contact Method */}
               <div>
-                <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Contact Method</span>
+                <span style={{ display: 'inline-flex', alignSelf: 'flex-start', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Contact Method</span>
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                   {(['Email', 'Phone Call', 'SMS'] as const).map(ch => {
                     const checked = dChannels.has(ch)
@@ -363,7 +365,7 @@ export default function HomePage() {
               </div>
 
               {/* STEP 2 — Contact Info */}
-              <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 2 — Contact Info</span>
+              <span style={{ display: 'inline-flex', alignSelf: 'flex-start', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 2 — Contact Info</span>
               <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={labelSt}>First Name</label>
@@ -391,7 +393,7 @@ export default function HomePage() {
 
               {/* STEP 3 — Select Scenario */}
               <div>
-                <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 3 — Select Scenario</span>
+                <span style={{ display: 'inline-flex', alignSelf: 'flex-start', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 3 — Select Scenario</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {SCENARIOS.map(s => {
                     const active = dScenario === s.id
@@ -421,7 +423,7 @@ export default function HomePage() {
               {dError && <p style={{ color: C.red, fontSize: 14, margin: 0 }}>{dError}</p>}
 
               {/* STEP 4 — Start Demo */}
-              {!dSuccess && <span style={{ display: 'inline-block', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 4 — Start Demo</span>}
+              {!dSuccess && <span style={{ display: 'inline-flex', alignSelf: 'flex-start', background: C.blueDim, color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase', marginBottom: 8 }}>Step 4 — Start Demo</span>}
               {dSuccess ? (
                 <div style={{ background: C.greenDim, border: `1.5px solid ${C.green}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
                   <div style={{ fontSize: 40, color: C.green, fontWeight: 700, marginBottom: 12, lineHeight: 1 }}>✓</div>
