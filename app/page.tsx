@@ -113,7 +113,7 @@ export default function HomePage() {
   // Demo form
   const [dFirst, setDFirst] = useState('')
   const [dLast, setDLast] = useState('')
-  const [dCompany] = useState('Meridian Supply Co.')
+  const [dCompany] = useState('MVP Supplies')
   const [dEmail, setDEmail] = useState('')
   const [dPhone, setDPhone] = useState('')
   const [dChannel, setDChannel] = useState<'Email' | 'Phone Call' | 'SMS' | 'Both'>('Email')
