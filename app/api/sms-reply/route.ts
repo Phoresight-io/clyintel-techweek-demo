@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DemoSession, ConversationEntry } from "@/lib/supabase";
 
 const SCENARIO_SUFFIX: Record<number, string> = {
-  1: "Invoice is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask. CRITICAL: reply MUST be 159 characters or fewer.",
-  2: "Invoice is 45 days past due. Tone: direct and urgent. Payment plan available. CRITICAL: reply MUST be 159 characters or fewer.",
-  3: "Invoice is 90 days past due. Tone: serious, final notice. Escalation to collections next. CRITICAL: reply MUST be 159 characters or fewer.",
+  1: "Invoice is 7 days past due. Tone: warm and helpful. Offer the payment link if they ask. NEGOTIATION: Only if client asks or indicates inability to pay — offer payment plan first (up to 3 equal installments, state each amount). If declined, offer discount starting at 5% up to 20% max with a pay-by date no more than 7 days out. Always state exact dollar amount. Never combine plan and discount. Never exceed 20%. If both declined, secure a Promise to Pay date. CRITICAL: reply MUST be 159 characters or fewer.",
+  2: "Invoice is 45 days past due. Tone: direct and urgent. NEGOTIATION: Only if client asks or indicates inability to pay — offer payment plan first (up to 3 equal installments, state each amount). If declined, offer discount starting at 5% up to 20% max with a pay-by date no more than 7 days out. Always state exact dollar amount. Never combine plan and discount. Never exceed 20%. If both declined, secure a Promise to Pay date. CRITICAL: reply MUST be 159 characters or fewer.",
+  3: "Invoice is 90 days past due. Tone: serious, final notice. Escalation to collections next. NEGOTIATION: Only if client asks or indicates inability to pay — offer payment plan first (up to 3 equal installments, state each amount). If declined, offer discount starting at 5% up to 20% max with a pay-by date no more than 7 days out. Always state exact dollar amount. Never combine plan and discount. Never exceed 20%. If both declined, secure a Promise to Pay date. CRITICAL: reply MUST be 159 characters or fewer.",
 };
 
 function twiml(message: string): NextResponse {
