@@ -10,6 +10,12 @@ const OPENING_SMS: Record<number, string> = {
   3: "Hi {{name}}, final notice from Hartwell Consulting Group. Invoice INV-2024-0612 for $15,200.00 is 90 days overdue. Reply now to avoid escalation to collections.",
 }
 
+const INVOICE_NUMBER: Record<number, string> = {
+  1: 'INV-2024-0891',
+  2: 'INV-2024-0744',
+  3: 'INV-2024-0612',
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -135,10 +141,10 @@ export async function POST(req: NextRequest) {
       await sendPhoneCall()
     } else if (channel === 'SMS') {
       await sendSMS(phone, name, scenarioNum)
-      await (supabase as any).from('communications').insert({
+      await (getSupabase() as any).from('communications').insert({
         channel: 'sms',
         direction: 'outbound',
-        subject: `Opening SMS — ${invoice.number}`,
+        subject: `Opening SMS — ${INVOICE_NUMBER[scenarioNum]}`,
         body: OPENING_SMS[scenarioNum].replace('{{name}}', name.split(' ')[0]),
         sent_at: new Date().toISOString(),
         status: 'sent',
