@@ -43,12 +43,18 @@ export async function POST(req: NextRequest) {
     const name = `${firstName} ${lastName}`
     const companyName = company ?? ''
 
+    const methodUsed = channel === 'Phone Call' ? 'phone_call' : channel.toLowerCase()
+
     const { error: dbError } = await (getSupabase() as any).from('demo_sessions').insert({
       name,
       company_name: companyName,
       phone,
       scenario: scenarioNum,
       conversation_history: [],
+      event_tag: 'boston_tech_week_2026',
+      method_used: methodUsed,
+      scenario_used: scenario,
+      submitted_at: new Date().toISOString(),
     })
     if (dbError) throw dbError
 
