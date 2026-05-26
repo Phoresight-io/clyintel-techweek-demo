@@ -53,12 +53,7 @@ const FEATURES = [
   { icon: '🔗', title: 'Works With Your Existing Tools', desc: 'Connects with the Invoice and A/R software you already use. No need to change your workflow to get started.' },
 ]
 
-const SURVEY_SINGLES = [
-  { key: 'clients', q: '1. How many clients do you actively invoice each month?', opts: ['1–5', '6–20', '21–50', '50+'] },
-  { key: 'headache', q: "2. What's your biggest AR headache?", opts: ['Chasing late payments', 'Knowing who to prioritize', 'Manual follow-up time', 'Cash flow unpredictability'] },
-  { key: 'process', q: '3. How do you currently follow up on overdue invoices?', opts: ['Manual emails or calls', 'Accounting software reminders', 'Nothing formal', 'Outsourced'] },
-  { key: 'pastDue', q: '4. What % of your invoices go past due each month?', opts: ['Less than 10%', '10–25%', '25–50%', 'Over 50%'] },
-]
+const SURVEY_Q3_OPTS = ['Email', 'Phone calls', 'Text', 'Software', 'Outsourced', 'When I get to it 😅', 'Mail letters']
 
 const BG_MAP: Record<string, string> = {
   [C.blue]: C.blueDim,
@@ -140,8 +135,7 @@ export default function HomePage() {
   // Survey
   const [sAns, setSAns] = useState<Record<string, string>>({})
   const [sMulti, setSMulti] = useState<string[]>([])
-  const [sIndustry, setSIndustry] = useState('')
-  const [sWillPay, setSWillPay] = useState<string | null>(null)
+  const [sComments, setSComments] = useState('')
   const [sDone, setSDone] = useState(false)
 
   // Early access
@@ -523,7 +517,7 @@ export default function HomePage() {
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <SectionTag label="SURVEY" color={C.blue} />
           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>We Could Use Your Help</h2>
-          <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>7 questions. Your answers shape what we build next.</p>
+          <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>8 questions. Your answers shape what we build next.</p>
 
           {sDone ? (
             <div style={{ background: C.card, borderRadius: 20, padding: '48px 32px', boxShadow: C.shadow, border: `1px solid ${C.border}`, textAlign: 'center' }}>
@@ -531,50 +525,132 @@ export default function HomePage() {
               <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 30, color: C.text, margin: '0 0 10px' }}>Thank you</h3>
               <p style={{ color: C.muted, fontSize: 15, margin: 0 }}>Your feedback goes straight to the product team.</p>
             </div>
-          ) : (
-            <div style={{ background: C.card, borderRadius: 20, border: `1px solid ${C.border}`, boxShadow: C.shadow, overflow: 'hidden' }}>
-              {SURVEY_SINGLES.map(q => (
-                <div key={q.key} style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
-                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>{q.q}</p>
+          ) : (() => {
+            const answeredCount = [
+              !!sAns.attendance,
+              !!sAns.headache,
+              sMulti.length > 0,
+              !!sAns.payLate,
+              !!sAns.timeChasing,
+              !!sAns.pricing,
+              !!sAns.demo,
+              sComments.trim().length > 0,
+            ].filter(Boolean).length
+            const canSubmit = answeredCount >= 2
+            return (
+              <div style={{ background: C.card, borderRadius: 20, border: `1px solid ${C.border}`, boxShadow: C.shadow, overflow: 'hidden' }}>
+                {/* Q1 */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>Are you joining us remotely or here in person?</p>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {q.opts.map(o => (
-                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, [q.key]: o }))} style={chip(sAns[q.key] === o, C.blue, C.blueDim)}>{o}</button>
+                    {['📍 Here in person', '💻 Joining remotely'].map(o => (
+                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, attendance: o }))} style={chip(sAns.attendance === o, C.blue, C.blueDim)}>{o}</button>
                     ))}
                   </div>
                 </div>
-              ))}
 
-              <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
-                <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 4px', lineHeight: 1.5 }}>5. Which recovery channels would you trust most?</p>
-                <p style={{ fontSize: 13, color: C.dim, margin: '0 0 14px' }}>Select all that apply</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {['Email', 'SMS', 'Voice', 'All three'].map(o => (
-                    <button key={o} type="button" onClick={() => toggleMulti(o)} style={chip(sMulti.includes(o), C.blue, C.blueDim)}>{o}</button>
-                  ))}
+                {/* Q2 */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>{"What's your biggest invoicing headache? 🤕"}</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['I actually enjoy it 😄', 'Everything about chasing payments 😤', 'The time it eats up ⏱️', 'Never knowing when cash is coming in 😰'].map(o => (
+                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, headache: o }))} style={chip(sAns.headache === o, C.blue, C.blueDim)}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q3 - multi-select */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 4px', lineHeight: 1.5 }}>How do you currently follow up on late payments?</p>
+                  <p style={{ fontSize: 13, color: C.dim, margin: '0 0 14px' }}>Select all that apply</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {SURVEY_Q3_OPTS.map(o => (
+                      <button key={o} type="button" onClick={() => toggleMulti(o)} style={chip(sMulti.includes(o), C.blue, C.blueDim)}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q4 */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>How often do clients pay late?</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['Rarely/Never', 'Sometimes', 'Almost always'].map(o => (
+                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, payLate: o }))} style={chip(sAns.payLate === o, C.blue, C.blueDim)}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q5 */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>How much time do you spend chasing late payments each month? ⏱️</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['Less than 5 hrs', 'Between 5–10 hrs', 'More than 10 hrs'].map(o => (
+                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, timeChasing: o }))} style={chip(sAns.timeChasing === o, C.blue, C.blueDim)}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q6 */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>{"What do you think of Clyintel's pricing?"}</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['😁 Very reasonable', '🙂 Fair for the value', '😐 Not sure yet', '🤔 A bit steep'].map(o => (
+                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, pricing: o }))} style={chip(sAns.pricing === o, C.blue, C.blueDim)}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q7 */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>How was the live demo experience? 🚀</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['Loved it', 'Pretty good', 'Needs work', "Didn't try it"].map(o => (
+                      <button key={o} type="button" onClick={() => setSAns(prev => ({ ...prev, demo: o }))} style={chip(sAns.demo === o, C.blue, C.blueDim)}>{o}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q8 - free text */}
+                <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>Anything else? We&apos;re all ears 👂</p>
+                  <div style={{ position: 'relative' }}>
+                    <textarea
+                      value={sComments}
+                      onChange={e => setSComments(e.target.value.slice(0, 50))}
+                      placeholder="Your thoughts…"
+                      rows={3}
+                      style={{ ...inp, resize: 'none', paddingBottom: 28 }}
+                    />
+                    <span style={{
+                      position: 'absolute', bottom: 8, right: 12, fontSize: 12, fontWeight: 600,
+                      color: sComments.length >= 50 ? '#EF4444' : C.dim,
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}>{sComments.length}/50</span>
+                  </div>
+                </div>
+
+                <div style={{ padding: '24px 28px' }}>
+                  <button
+                    type="button"
+                    onClick={() => { if (canSubmit) setSDone(true) }}
+                    disabled={!canSubmit}
+                    style={{
+                      width: '100%', minHeight: 50, borderRadius: 10, border: 'none',
+                      background: canSubmit ? C.blue : C.border,
+                      color: canSubmit ? '#fff' : C.dim,
+                      fontSize: 16, fontWeight: 700,
+                      cursor: canSubmit ? 'pointer' : 'not-allowed',
+                      fontFamily: "'DM Sans', sans-serif",
+                      opacity: canSubmit ? 1 : 0.6,
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    Submit Survey
+                  </button>
                 </div>
               </div>
-
-              <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
-                <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>6. What industry are you in?</p>
-                <input className="li" value={sIndustry} onChange={e => setSIndustry(e.target.value)} placeholder="e.g. Construction, Consulting, Healthcare…" style={inp} />
-              </div>
-
-              <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.border}` }}>
-                <p style={{ fontWeight: 600, fontSize: 15, color: C.text, margin: '0 0 14px', lineHeight: 1.5 }}>7. Would you pay for a tool that automatically recovered overdue invoices?</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {["Yes, I'd pay today", 'Maybe with more info', 'I need to see results first'].map(o => (
-                    <button key={o} type="button" onClick={() => setSWillPay(o)} style={chip(sWillPay === o, C.blue, C.blueDim)}>{o}</button>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ padding: '24px 28px' }}>
-                <button type="button" onClick={() => setSDone(true)} style={{ width: '100%', minHeight: 50, borderRadius: 10, background: C.blue, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
-                  Submit Survey
-                </button>
-              </div>
-            </div>
-          )}
+            )
+          })()}
         </div>
       </section>
 
