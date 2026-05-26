@@ -359,14 +359,16 @@ export default function HomePage() {
             <p style={{ fontSize: mob ? 19 : 22, color: C.muted, margin: '0 0 36px', lineHeight: 1.6 }}>
               <em>Collections</em> &amp; <em>Client Intelligence</em> tool built for Small Businesses
             </p>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {['Stop Chasing. Start Collecting.', 'Quick & Easy Setup. Save Time. Increase Revenue.', 'AI-powered outreach via email, text, & phone calls', 'Integrates with existing Invoice & A/R software'].map(b => (
-                <li key={b} style={{ display: 'flex', alignItems: 'center', justifyContent: heroMob ? 'flex-start' : 'center', gap: 10 }}>
-                  <span style={{ color: C.blue, fontWeight: 700, fontSize: 16, lineHeight: 1.5, flexShrink: 0 }}>✓</span>
-                  <span style={{ fontSize: 16, color: C.text, lineHeight: 1.5 }}>{b}</span>
-                </li>
-              ))}
-            </ul>
+            <div style={{ maxWidth: 420, margin: '0 auto' }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {['Stop Chasing. Start Collecting.', 'Quick & Easy Setup. Save Time. Increase Revenue.', 'AI-powered outreach via email, text, & phone calls', 'Integrates with existing Invoice & A/R software'].map(b => (
+                  <li key={b} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, textAlign: 'left' }}>
+                    <span style={{ color: C.blue, fontWeight: 700, fontSize: 16, lineHeight: 1.5, flexShrink: 0 }}>✓</span>
+                    <span style={{ fontSize: 16, color: C.text, lineHeight: 1.5 }}>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: heroMob ? 'flex-start' : 'center' }}>
               <button onClick={() => scrollTo('demo')} style={{ padding: '13px 28px', borderRadius: 10, background: C.blue, color: '#fff', border: 'none', fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>
                 Try the Live Demo
