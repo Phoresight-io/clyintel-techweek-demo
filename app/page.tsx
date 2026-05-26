@@ -42,10 +42,6 @@ const PLANS = [
     name: 'Plus', price: 79, color: '#1E3A8A', dim: 'rgba(30,58,138,0.08)',
     bullets: ['Unlimited client scores', 'Advanced multi-step workflows', 'Predictive delinquency insights', 'Payment plan creation', '12% revenue share on recoveries', 'Webhook support'],
   },
-  {
-    name: 'Pro', price: 199, color: '#172554', dim: 'rgba(23,37,84,0.08)',
-    bullets: ['Unlimited recoveries', 'Multi-channel: email + SMS + voice', 'Advanced negotiation', 'Custom dashboards', '5% revenue share on recoveries', 'Quarterly business reviews'],
-  },
 ]
 
 const FEATURES = [
@@ -330,7 +326,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: 1200, margin: '0 auto' }}>
           <img src="/brand/FullLogo_Transparent_NoBuffer.jpg" alt="Phoresight" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
           <div className="hs" style={{ display: 'flex', gap: 2, overflowX: 'auto', marginLeft: 12 }}>
-            {[['Survey', 'survey'], ['Pricing', 'pricing'], ['Features', 'features'], ['Waitlist', 'early-access']].map(([l, h]) => (
+            {[['Survey', 'survey'], ['Pricing', 'pricing'], ['Features', 'features']].map(([l, h]) => (
               <button key={h} onClick={() => scrollTo(h)}
                 onMouseEnter={() => setNavHover(h)} onMouseLeave={() => setNavHover(null)}
                 style={{
@@ -351,25 +347,25 @@ export default function HomePage() {
         background: 'radial-gradient(ellipse at 70% -10%, rgba(37,99,235,0.08) 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, rgba(124,58,237,0.06) 0%, transparent 50%)',
         padding: mob ? '52px 20px 64px' : '88px 24px 96px',
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%' }}>
-          <div style={{ width: '100%' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', textAlign: 'center' }}>
+          <div style={{ maxWidth: 680, margin: '0 auto' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 999, padding: '5px 14px', marginBottom: 28 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.green, display: 'inline-block', flexShrink: 0 }} />
               <span style={{ fontSize: 13, fontWeight: 600, color: '#2563EB' }}>Boston Tech Week 2026</span>
             </div>
             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 52 : 68, lineHeight: 1.03, color: C.text, margin: '0 0 18px', letterSpacing: '-1.5px' }}>Clyintel</h1>
-            <p style={{ fontSize: mob ? 19 : 22, color: C.muted, margin: '0 0 36px', maxWidth: 520, lineHeight: 1.6 }}>
-              <em>Collections</em> &amp; <em>Client Intelligence</em> tool built for Small Businesses.
+            <p style={{ fontSize: mob ? 19 : 22, color: C.muted, margin: '0 0 36px', lineHeight: 1.6 }}>
+              <em>Collections</em> &amp; <em>Client Intelligence</em> tool built for Small Businesses
             </p>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {['Stop Chasing. Start Collecting.', 'Quick & Easy Setup. Save Time. Increase Revenue.', 'AI-powered outreach via email, text, & phone calls', 'Integrates with existing Invoice & A/R software'].map(b => (
-                <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                <li key={b} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
                   <span style={{ color: C.blue, fontWeight: 700, fontSize: 16, lineHeight: 1.5, flexShrink: 0 }}>✓</span>
                   <span style={{ fontSize: 16, color: C.text, lineHeight: 1.5 }}>{b}</span>
                 </li>
               ))}
             </ul>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
               <button onClick={() => scrollTo('demo')} style={{ padding: '13px 28px', borderRadius: 10, background: C.blue, color: '#fff', border: 'none', fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>
                 Try the Live Demo
               </button>
@@ -481,7 +477,7 @@ export default function HomePage() {
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 4 }}>
                           <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: C.text }}>{s.label}</p>
-                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 9px', borderRadius: 6, background: active ? s.color : `${s.color}18`, color: active ? '#fff' : s.color, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', padding: '4px 9px', borderRadius: 6, background: s.color, color: '#fff', whiteSpace: 'nowrap', flexShrink: 0 }}>
                             {s.tag}
                           </span>
                         </div>
