@@ -410,7 +410,7 @@ export default function HomePage() {
                         }}>
                           {checked && <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, lineHeight: 1 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize: 15, color: C.text, fontWeight: 500, userSelect: 'none' }}>{ch}</span>
+                        <span style={{ fontSize: 15, color: C.text, fontWeight: 500, userSelect: 'none' }}>{ch === 'Email' ? '📧 Email' : ch === 'Phone Call' ? '📞 Phone Call' : ch}</span>
                       </div>
                     )
                   })}
@@ -517,7 +517,7 @@ export default function HomePage() {
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <SectionTag label="SURVEY" color={C.blue} />
           <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: mob ? 32 : 40, color: C.text, margin: '0 0 12px', letterSpacing: '-0.5px' }}>We Could Use Your Help</h2>
-          <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>8 questions. Your answers shape what we build next.</p>
+          <p style={{ fontSize: 16, color: C.muted, margin: '0 0 32px', lineHeight: 1.6 }}>A 2 question minimum. Your answers shape what we build next. 🫶</p>
 
           {sDone ? (
             <div style={{ background: C.card, borderRadius: 20, padding: '48px 32px', boxShadow: C.shadow, border: `1px solid ${C.border}`, textAlign: 'center' }}>
