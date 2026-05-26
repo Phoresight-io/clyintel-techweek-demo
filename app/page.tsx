@@ -121,6 +121,7 @@ function PlanCard({ plan, onCta }: { plan: typeof PLANS[0]; onCta: () => void })
 export default function HomePage() {
   const [mob, setMob] = useState(false)
   const [tab, setTab] = useState(false)
+  const [heroMob, setHeroMob] = useState(false)
   const [showBtt, setShowBtt] = useState(false)
   const [navHover, setNavHover] = useState<string | null>(null)
 
@@ -165,6 +166,7 @@ export default function HomePage() {
       const w = window.innerWidth
       setMob(w < 640)
       setTab(w >= 640 && w < 1024)
+      setHeroMob(w < 768)
     }
     check()
     window.addEventListener('resize', check)
@@ -347,7 +349,7 @@ export default function HomePage() {
         background: 'radial-gradient(ellipse at 70% -10%, rgba(37,99,235,0.08) 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, rgba(124,58,237,0.06) 0%, transparent 50%)',
         padding: mob ? '52px 20px 64px' : '88px 24px 96px',
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', textAlign: 'center' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', textAlign: heroMob ? 'left' : 'center' }}>
           <div style={{ maxWidth: 680, margin: '0 auto' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 999, padding: '5px 14px', marginBottom: 28 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.green, display: 'inline-block', flexShrink: 0 }} />
@@ -359,13 +361,13 @@ export default function HomePage() {
             </p>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {['Stop Chasing. Start Collecting.', 'Quick & Easy Setup. Save Time. Increase Revenue.', 'AI-powered outreach via email, text, & phone calls', 'Integrates with existing Invoice & A/R software'].map(b => (
-                <li key={b} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                <li key={b} style={{ display: 'flex', alignItems: 'center', justifyContent: heroMob ? 'flex-start' : 'center', gap: 10 }}>
                   <span style={{ color: C.blue, fontWeight: 700, fontSize: 16, lineHeight: 1.5, flexShrink: 0 }}>✓</span>
                   <span style={{ fontSize: 16, color: C.text, lineHeight: 1.5 }}>{b}</span>
                 </li>
               ))}
             </ul>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: heroMob ? 'flex-start' : 'center' }}>
               <button onClick={() => scrollTo('demo')} style={{ padding: '13px 28px', borderRadius: 10, background: C.blue, color: '#fff', border: 'none', fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>
                 Try the Live Demo
               </button>
