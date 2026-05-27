@@ -737,15 +737,25 @@ export default function HomePage() {
             <div style={{ background: C.card, borderRadius: 20, padding: mob ? '28px 20px' : '36px 32px', boxShadow: C.shadowMd, border: `1px solid ${C.border}` }}>
               <div style={{ display: 'grid', gridTemplateColumns: mob ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
                 <div style={{ textAlign: 'left' }}>
-                  <label style={labelSt}>First Name</label>
-                  <input className="li" value={eaFirst} onChange={e => setEaFirst(e.target.value)} placeholder="Alex" style={inp} />
+                  <label style={labelSt}>Name</label>
+                  <input className="li" value={eaFirst} onChange={e => setEaFirst(e.target.value)} placeholder="Alex Johnson" style={inp} />
                 </div>
                 <div style={{ textAlign: 'left' }}>
                   <label style={labelSt}>Email</label>
                   <input className="li" type="email" value={eaEmail} onChange={e => setEaEmail(e.target.value)} placeholder="alex@company.com" style={inp} />
                 </div>
               </div>
-              <button type="button" onClick={() => setEaDone(true)} style={{ width: '100%', minHeight: 50, borderRadius: 10, background: C.green, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+              <button type="button" onClick={async () => {
+                try {
+                  const res = await fetch('/api/waitlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: eaFirst, email: eaEmail }),
+                  })
+                  if (!res.ok) throw new Error('Failed')
+                } catch {}
+                setEaDone(true)
+              }} style={{ width: '100%', minHeight: 50, borderRadius: 10, background: C.green, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
                 Join Waitlist
               </button>
             </div>
